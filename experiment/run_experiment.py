@@ -19,6 +19,7 @@ from sklearn.metrics import (
     rand_score,
     mutual_info_score,
 )
+from somlearn.som import SOM
 from pathlib import Path
 
 EXPERIMENT_DIR = Path(__file__).parent
@@ -38,38 +39,40 @@ RESULTS_DIR.mkdir(exist_ok=True)
 
 DATASETS = [("GEMLER", load_gemler_data)]
 
+SEED = 23
+
 CV_SPLITS = 2
 CV_REPEATS = 5
-CV_SCHEME = RepeatedStratifiedKFold(n_repeats=CV_REPEATS, n_splits=CV_SPLITS)
+CV_SCHEME = RepeatedStratifiedKFold(
+    n_repeats=CV_REPEATS, n_splits=CV_SPLITS, random_state=SEED
+)
 
 K_VALUES = [2, 3, 4, 5, 6, 7, 8]
 K_MEANS_INIT = ["k-means++", "random"]
 K_MEDOIDS_INIT = ["k-medoids++", "random"]
-EPS_VALUES = [0.1, 0.5, 1, 2, 5, 10]
-MIN_SAMPLES_VALUES = [2, 5, 10, 20, 50]
 N_CLUSTER_VALUES = [2, 3, 4, 5, 6, 7, 8]
 LINKAGE_VALUES = ["ward", "complete", "average"]
 BIRCH_THRESHOLD_VALUES = [0.1, 0.5, 1, 2, 5, 10]
 BIRCH_BRANCHING_FACTOR_VALUES = [5, 10, 20, 50, 100]
+EPS_VALUES = [0.1, 0.5, 1, 2, 5, 10]
+MIN_SAMPLES_VALUES = [2, 5, 10, 20, 50]
 XI_VALUES = [0.01, 0.05, 0.1, 0.5, 1, 2]
 N_COMPONENTS_VALUES = [2, 3, 4, 5, 6, 7, 8]
 COVARIANCE_TYPE_VALUES = ["full", "tied", "diag", "spherical"]
+SOM_N_COLS_ROWS_VALUES = [3, 4, 5, 6, 7, 8, 9, 10]
+SOM_INITIALCODEBOOK_VALUES = [None, "pca"]
+SOM_NEIGHBORHOOD_VALUES = ["gaussian", "bubble"]
 
 PARAM_GRID = [
     {
-        "cluster_algo": [KMeans(n_init="auto")],
+        "cluster_algo": [KMeans(n_init="auto", random_state=SEED)],
         "cluster_algo__n_clusters": K_VALUES,
         "cluster_algo__init": K_MEANS_INIT,
     },
     {
-        "cluster_algo": [KMedoids()],
+        "cluster_algo": [KMedoids(random_state=SEED)],
         "cluster_algo__n_clusters": K_VALUES,
         "cluster_algo__init": K_MEDOIDS_INIT,
-    },
-    {
-        "cluster_algo": [DBSCAN()],
-        "cluster_algo__eps": EPS_VALUES,
-        "cluster_algo__min_samples": MIN_SAMPLES_VALUES,
     },
     {
         "cluster_algo": [AgglomerativeClustering()],
@@ -82,14 +85,26 @@ PARAM_GRID = [
         "cluster_algo__branching_factor": BIRCH_BRANCHING_FACTOR_VALUES,
     },
     {
+        "cluster_algo": [DBSCAN()],
+        "cluster_algo__eps": EPS_VALUES,
+        "cluster_algo__min_samples": MIN_SAMPLES_VALUES,
+    },
+    {
         "cluster_algo": [OPTICS()],
         "cluster_algo__xi": XI_VALUES,
         "cluster_algo__min_samples": MIN_SAMPLES_VALUES,
     },
     {
-        "cluster_algo": [GaussianMixture()],
+        "cluster_algo": [GaussianMixture(random_state=SEED)],
         "cluster_algo__n_components": N_COMPONENTS_VALUES,
         "cluster_algo__covariance_type": COVARIANCE_TYPE_VALUES,
+    },
+    {
+        "cluster_algo": [SOM(random_state=SEED)],
+        "cluster_algo__n_cols": SOM_N_COLS_ROWS_VALUES,
+        "cluster_algo__n_rows": SOM_N_COLS_ROWS_VALUES,
+        "cluster_algo__initialcodebook": SOM_INITIALCODEBOOK_VALUES,
+        "cluster_algo__neighborhood": SOM_NEIGHBORHOOD_VALUES,
     },
 ]
 
