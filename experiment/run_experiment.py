@@ -1,11 +1,23 @@
 import pandas as pd
+import numpy as np
 from utils import (
-    load_gemler_data,
+    SEED,
+    load_gemler_data_normed,
+    load_gemler_normed_param_grid,
+    load_metabric_data_normed,
+    load_metabric_normed_param_grid,
     make_clustering_scorer_supervised,
     make_clustering_scorer_unsupervised,
 )
 from sklearn.model_selection import GridSearchCV, RepeatedStratifiedKFold
-from sklearn.cluster import KMeans, AgglomerativeClustering, Birch, DBSCAN, OPTICS
+from sklearn.cluster import (
+    KMeans,
+    AgglomerativeClustering,
+    Birch,
+    DBSCAN,
+    OPTICS,
+    AffinityPropagation,
+)
 from sklearn.mixture import GaussianMixture
 from sklearn_extra.cluster import KMedoids
 import logging
@@ -16,8 +28,8 @@ from sklearn.metrics import (
     silhouette_score,
     calinski_harabasz_score,
     davies_bouldin_score,
-    rand_score,
-    mutual_info_score,
+    adjusted_mutual_info_score,
+    adjusted_rand_score,
 )
 from somlearn.som import SOM
 from pathlib import Path
@@ -37,9 +49,10 @@ logging.basicConfig(
 RESULTS_DIR = EXPERIMENT_DIR / f"results_{START_TIMESTAMP}"
 RESULTS_DIR.mkdir(exist_ok=True)
 
-DATASETS = [("GEMLER", load_gemler_data)]
-
-SEED = 23
+DATASETS = [
+    ("GEMLER", load_gemler_data_normed, load_gemler_normed_param_grid),
+    ("METABRIC", load_metabric_data_normed, load_metabric_normed_param_grid),
+]
 
 CV_SPLITS = 2
 CV_REPEATS = 5
@@ -47,90 +60,33 @@ CV_SCHEME = RepeatedStratifiedKFold(
     n_repeats=CV_REPEATS, n_splits=CV_SPLITS, random_state=SEED
 )
 
-K_VALUES = [2, 3, 4, 5, 6, 7, 8]
-K_MEANS_INIT = ["k-means++", "random"]
-K_MEDOIDS_INIT = ["k-medoids++", "random"]
-N_CLUSTER_VALUES = [2, 3, 4, 5, 6, 7, 8]
-LINKAGE_VALUES = ["ward", "complete", "average"]
-BIRCH_THRESHOLD_VALUES = [0.1, 0.5, 1, 2, 5, 10]
-BIRCH_BRANCHING_FACTOR_VALUES = [5, 10, 20, 50, 100]
-EPS_VALUES = [0.1, 0.5, 1, 2, 5, 10]
-MIN_SAMPLES_VALUES = [2, 5, 10, 20, 50]
-XI_VALUES = [0.01, 0.05, 0.1, 0.5, 1, 2]
-N_COMPONENTS_VALUES = [2, 3, 4, 5, 6, 7, 8]
-COVARIANCE_TYPE_VALUES = ["full", "tied", "diag", "spherical"]
-SOM_N_COLS_ROWS_VALUES = [3, 4, 5, 6, 7, 8, 9, 10]
-SOM_INITIALCODEBOOK_VALUES = [None, "pca"]
-SOM_NEIGHBORHOOD_VALUES = ["gaussian", "bubble"]
-
-PARAM_GRID = [
-    {
-        "cluster_algo": [KMeans(n_init="auto", random_state=SEED)],
-        "cluster_algo__n_clusters": K_VALUES,
-        "cluster_algo__init": K_MEANS_INIT,
-    },
-    {
-        "cluster_algo": [KMedoids(random_state=SEED)],
-        "cluster_algo__n_clusters": K_VALUES,
-        "cluster_algo__init": K_MEDOIDS_INIT,
-    },
-    {
-        "cluster_algo": [AgglomerativeClustering()],
-        "cluster_algo__n_clusters": N_CLUSTER_VALUES,
-        "cluster_algo__linkage": LINKAGE_VALUES,
-    },
-    {
-        "cluster_algo": [Birch()],
-        "cluster_algo__threshold": BIRCH_THRESHOLD_VALUES,
-        "cluster_algo__branching_factor": BIRCH_BRANCHING_FACTOR_VALUES,
-    },
-    {
-        "cluster_algo": [DBSCAN()],
-        "cluster_algo__eps": EPS_VALUES,
-        "cluster_algo__min_samples": MIN_SAMPLES_VALUES,
-    },
-    {
-        "cluster_algo": [OPTICS()],
-        "cluster_algo__xi": XI_VALUES,
-        "cluster_algo__min_samples": MIN_SAMPLES_VALUES,
-    },
-    {
-        "cluster_algo": [GaussianMixture(random_state=SEED)],
-        "cluster_algo__n_components": N_COMPONENTS_VALUES,
-        "cluster_algo__covariance_type": COVARIANCE_TYPE_VALUES,
-    },
-    {
-        "cluster_algo": [SOM(random_state=SEED)],
-        "cluster_algo__n_cols": SOM_N_COLS_ROWS_VALUES,
-        "cluster_algo__n_rows": SOM_N_COLS_ROWS_VALUES,
-        "cluster_algo__initialcodebook": SOM_INITIALCODEBOOK_VALUES,
-        "cluster_algo__neighborhood": SOM_NEIGHBORHOOD_VALUES,
-    },
-]
-
 
 SCORERS = {
     "silhouette": make_clustering_scorer_unsupervised(silhouette_score),
     "calinski_harabasz": make_clustering_scorer_unsupervised(calinski_harabasz_score),
     "davies_bouldin": make_clustering_scorer_unsupervised(davies_bouldin_score),
-    "rand_index": make_clustering_scorer_supervised(rand_score),
-    "mutual_info": make_clustering_scorer_supervised(mutual_info_score),
+    "adjusted_rand_index": make_clustering_scorer_supervised(adjusted_rand_score),
+    "adjusted_mutual_info": make_clustering_scorer_supervised(
+        adjusted_mutual_info_score
+    ),
 }
 
-GRID_SEARCH_KWARGS = dict(
-    estimator=Pipeline([("cluster_algo", None)]),
-    param_grid=PARAM_GRID,
-    cv=CV_SCHEME,
-    scoring=SCORERS,
-    n_jobs=-1,
-    verbose=2,
-    refit=list(SCORERS.keys())[0],
-)
+
+def get_grid_search_kwargs(param_grid: list[dict]) -> dict:
+    return dict(
+        estimator=Pipeline([("cluster_algo", None)]),
+        param_grid=param_grid,
+        cv=CV_SCHEME,
+        scoring=SCORERS,
+        n_jobs=-1,
+        verbose=2,
+        refit=list(SCORERS.keys())[0],
+    )
 
 
 def main() -> None:
     logging.info("Starting experiment...")
-    for name, data_loader in DATASETS:
+    for name, data_loader, param_grid_loader in DATASETS:
         try:
             logging.info("Loading %s data...", name)
             data, ground_truth = data_loader()
@@ -142,7 +98,7 @@ def main() -> None:
             )
             logging.info("%s was loaded.", name)
             logging.info("Running GridSearch for %s...", name)
-            grid_search = GridSearchCV(**GRID_SEARCH_KWARGS)
+            grid_search = GridSearchCV(**get_grid_search_kwargs(param_grid_loader()))
             grid_search.fit(data, ground_truth_encoded)
             logging.info("%s GridSearch done.", name)
             pd.DataFrame(grid_search.cv_results_).to_csv(
