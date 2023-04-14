@@ -73,7 +73,7 @@ def load_gemler_normed_param_grid() -> list[dict]:
     Param grid created with help of jupyter notebook: hyperparameters_exploration_gmler.ipynb
     """
 
-    K_VALUES = [2, 3, 4, 5, 6, 7, 8, 9, 10, 15]
+    K_VALUES = np.arange(2, 15, 1)
     K_MEANS_INIT = ["k-means++", "random"]
     K_MEDOIDS_INIT = ["k-medoids++", "random"]
     LINKAGE_VALUES = ["ward", "complete", "average", "single"]
@@ -91,8 +91,19 @@ def load_gemler_normed_param_grid() -> list[dict]:
         None,
     ]
     BIRCH_BRANCHING_FACTOR_VALUES = [5, 28, 52, 76, 100]
-    EPS_VALUES = [11.5, 12.75, 13.5, 14.0, 14.5]
-    MIN_SAMPLES_VALUES = [5, 90, 175, 260, 346, 431, 516, 601, 687, 772]
+    EPS_VALUES = [
+        11.341329848106783,
+        11.486816627113882,
+        11.846150753235138,
+        12.158006371221862,
+        12.254926310818119,
+        12.419676247975286,
+        13.231431260708911,
+        13.312087805263985,
+        13.439523570889282,
+        13.547102734215585,
+    ]
+    MIN_SAMPLES_VALUES = [5, 47, 89, 132, 174, 216, 259, 301, 343, 386]
     COVARIANCE_TYPE_VALUES = ["full", "tied", "diag", "spherical"]
     SOM_INITIALCODEBOOK_VALUES = [None, "pca"]
     SOM_NEIGHBORHOOD_VALUES = ["gaussian", "bubble"]
@@ -132,11 +143,14 @@ def load_gemler_normed_param_grid() -> list[dict]:
             "cluster_algo__branching_factor": BIRCH_BRANCHING_FACTOR_VALUES,
             "cluster_algo__n_clusters": K_VALUES + [None],
         },
-        {
-            "cluster_algo": [DBSCAN()],
-            "cluster_algo__eps": EPS_VALUES,
-            "cluster_algo__min_samples": MIN_SAMPLES_VALUES,
-        },
+        *[
+            {
+                "cluster_algo": [DBSCAN()],
+                "cluster_algo__eps": eps,
+                "cluster_algo__min_samples": min_samples,
+            }
+            for eps, min_samples in zip(EPS_VALUES, MIN_SAMPLES_VALUES)
+        ],
         {
             "cluster_algo": [OPTICS(cluster_method="dbscan")],
             "cluster_algo__min_samples": MIN_SAMPLES_VALUES,
@@ -186,7 +200,7 @@ def load_metabric_normed_param_grid() -> list[dict]:
     Param grid created with help of jupyter notebook: hyperparameters_exploration_metabric.ipynb
     """
 
-    K_VALUES = [2, 3, 4, 5, 6, 7, 8, 9, 10, 15]
+    K_VALUES = np.arange(2, 21, 1)
     K_MEANS_INIT = ["k-means++", "random"]
     K_MEDOIDS_INIT = ["k-medoids++", "random"]
     LINKAGE_VALUES = ["ward", "complete", "average", "single"]
@@ -204,8 +218,19 @@ def load_metabric_normed_param_grid() -> list[dict]:
         None,
     ]
     BIRCH_BRANCHING_FACTOR_VALUES = [5, 28, 52, 76, 100]
-    EPS_VALUES = [22.5, 24.5, 25.0, 26.0, 27.0]
-    MIN_SAMPLES_VALUES = [5, 122, 240, 358, 476, 594, 712, 830, 948, 1066]
+    EPS_VALUES = [
+        20.69517473682061,
+        22.48498912238429,
+        23.302572442900274,
+        23.155692960768324,
+        23.507704506746776,
+        23.648092851552313,
+        24.07875065144159,
+        24.182767571342755,
+        24.34726259428857,
+        24.46377826606799,
+    ]
+    MIN_SAMPLES_VALUES = [5, 63, 122, 181, 239, 298, 357, 415, 474, 533]
     COVARIANCE_TYPE_VALUES = ["full", "tied", "diag", "spherical"]
     SOM_INITIALCODEBOOK_VALUES = [None, "pca"]
     SOM_NEIGHBORHOOD_VALUES = ["gaussian", "bubble"]
@@ -245,11 +270,14 @@ def load_metabric_normed_param_grid() -> list[dict]:
             "cluster_algo__branching_factor": BIRCH_BRANCHING_FACTOR_VALUES,
             "cluster_algo__n_clusters": K_VALUES + [None],
         },
-        {
-            "cluster_algo": [DBSCAN()],
-            "cluster_algo__eps": EPS_VALUES,
-            "cluster_algo__min_samples": MIN_SAMPLES_VALUES,
-        },
+        *[
+            {
+                "cluster_algo": [DBSCAN()],
+                "cluster_algo__eps": eps,
+                "cluster_algo__min_samples": min_samples,
+            }
+            for eps, min_samples in zip(EPS_VALUES, MIN_SAMPLES_VALUES)
+        ],
         {
             "cluster_algo": [OPTICS(cluster_method="dbscan")],
             "cluster_algo__min_samples": MIN_SAMPLES_VALUES,
