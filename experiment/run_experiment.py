@@ -1,5 +1,5 @@
+from typing import Union
 import pandas as pd
-import numpy as np
 from utils import (
     SEED,
     load_gemler_data_normed,
@@ -10,16 +10,6 @@ from utils import (
     make_clustering_scorer_unsupervised,
 )
 from sklearn.model_selection import GridSearchCV, RepeatedStratifiedKFold
-from sklearn.cluster import (
-    KMeans,
-    AgglomerativeClustering,
-    Birch,
-    DBSCAN,
-    OPTICS,
-    AffinityPropagation,
-)
-from sklearn.mixture import GaussianMixture
-from sklearn_extra.cluster import KMedoids
 import logging
 from datetime import datetime
 from sklearn.preprocessing import LabelEncoder
@@ -31,7 +21,6 @@ from sklearn.metrics import (
     adjusted_mutual_info_score,
     adjusted_rand_score,
 )
-from somlearn.som import SOM
 from pathlib import Path
 
 EXPERIMENT_DIR = Path(__file__).parent
@@ -72,7 +61,7 @@ SCORERS = {
 }
 
 
-def get_grid_search_kwargs(param_grid: list[dict]) -> dict:
+def get_grid_search_kwargs(param_grid: Union[list[dict], dict]) -> dict:
     return dict(
         estimator=Pipeline([("cluster_algo", None)]),
         param_grid=param_grid,
@@ -98,12 +87,15 @@ def main() -> None:
             )
             logging.info("%s was loaded.", name)
             logging.info("Running GridSearch for %s...", name)
-            grid_search = GridSearchCV(**get_grid_search_kwargs(param_grid_loader()))
-            grid_search.fit(data, ground_truth_encoded)
-            logging.info("%s GridSearch done.", name)
-            pd.DataFrame(grid_search.cv_results_).to_csv(
-                RESULTS_DIR / f"{name}_grid_search.csv"
-            )
+            for i, (algo_name, algo_grid) in enumerate(param_grid_loader().items()):
+                grid_search = GridSearchCV(**get_grid_search_kwargs(algo_grid))
+                grid_search.fit(data, ground_truth_encoded)
+                logging.info("%s GridSearch done for %s.", name, algo_name)
+                pd.DataFrame(grid_search.cv_results_).to_csv(
+                    RESULTS_DIR / f"{name}_grid_search.csv",
+                    mode="a",
+                    header=(i == 0),
+                )
             logging.info("%s GridSearch results saved to csv.", name)
 
         except Exception as error:

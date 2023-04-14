@@ -122,29 +122,29 @@ def load_gemler_normed_param_grid() -> list[dict]:
         0.0,
     ]
 
-    return [
-        {
+    return {
+        "KMeans": {
             "cluster_algo": [KMeans(n_init="auto", random_state=SEED)],
             "cluster_algo__n_clusters": K_VALUES,
             "cluster_algo__init": K_MEANS_INIT,
         },
-        {
+        "KMedoids": {
             "cluster_algo": [KMedoids(random_state=SEED)],
             "cluster_algo__n_clusters": K_VALUES,
             "cluster_algo__init": K_MEDOIDS_INIT,
         },
-        {
+        "AgglomerativeClustering": {
             "cluster_algo": [AgglomerativeClustering()],
             "cluster_algo__n_clusters": K_VALUES,
             "cluster_algo__linkage": LINKAGE_VALUES,
         },
-        {
+        "Birch": {
             "cluster_algo": [Birch()],
             "cluster_algo__threshold": BIRCH_THRESHOLD_VALUES,
             "cluster_algo__branching_factor": BIRCH_BRANCHING_FACTOR_VALUES,
             "cluster_algo__n_clusters": list(K_VALUES) + [None],
         },
-        *[
+        "DBSCAN": [
             {
                 "cluster_algo": [DBSCAN()],
                 "cluster_algo__eps": [eps],
@@ -152,16 +152,16 @@ def load_gemler_normed_param_grid() -> list[dict]:
             }
             for eps, min_samples in zip(EPS_VALUES, MIN_SAMPLES_VALUES)
         ],
-        {
+        "OPTICS": {
             "cluster_algo": [OPTICS(cluster_method="dbscan")],
             "cluster_algo__min_samples": MIN_SAMPLES_VALUES,
         },
-        {
+        "GaussianMixture": {
             "cluster_algo": [GaussianMixture(random_state=SEED)],
             "cluster_algo__n_components": K_VALUES,
             "cluster_algo__covariance_type": COVARIANCE_TYPE_VALUES,
         },
-        *[
+        "SOM": [
             {
                 "cluster_algo": [SOM(random_state=SEED)],
                 "cluster_algo__n_cols": [k1],
@@ -172,12 +172,12 @@ def load_gemler_normed_param_grid() -> list[dict]:
             for k1, k2 in product([1] + list(K_VALUES), list(K_VALUES))
             if k1 * k2 <= max(K_VALUES)
         ],
-        {
+        "AffinityPropagation": {
             "cluster_algo": [AffinityPropagation(random_state=SEED)],
             "cluster_algo__damping": AFFINITY_PROP_DUMPING_VALUES,
             "cluster_algo__preference": AFFINITY_PROP_PREFERENCE_VALUES,
         },
-    ]
+    }
 
 
 # METABRIC
@@ -246,29 +246,29 @@ def load_metabric_normed_param_grid() -> list[dict]:
         0.0,
     ]
 
-    return [
-        {
+    return {
+        "KMeans": {
             "cluster_algo": [KMeans(n_init="auto", random_state=SEED)],
             "cluster_algo__n_clusters": K_VALUES,
             "cluster_algo__init": K_MEANS_INIT,
         },
-        {
+        "KMedoids": {
             "cluster_algo": [KMedoids(random_state=SEED)],
             "cluster_algo__n_clusters": K_VALUES,
             "cluster_algo__init": K_MEDOIDS_INIT,
         },
-        {
+        "AgglomerativeClustering": {
             "cluster_algo": [AgglomerativeClustering()],
             "cluster_algo__n_clusters": K_VALUES,
             "cluster_algo__linkage": LINKAGE_VALUES,
         },
-        {
+        "Birch": {
             "cluster_algo": [Birch()],
             "cluster_algo__threshold": BIRCH_THRESHOLD_VALUES,
             "cluster_algo__branching_factor": BIRCH_BRANCHING_FACTOR_VALUES,
             "cluster_algo__n_clusters": K_VALUES + [None],
         },
-        *[
+        "DBSCAN": [
             {
                 "cluster_algo": [DBSCAN()],
                 "cluster_algo__eps": [eps],
@@ -276,16 +276,16 @@ def load_metabric_normed_param_grid() -> list[dict]:
             }
             for eps, min_samples in zip(EPS_VALUES, MIN_SAMPLES_VALUES)
         ],
-        {
+        "OPTICS": {
             "cluster_algo": [OPTICS(cluster_method="dbscan")],
             "cluster_algo__min_samples": MIN_SAMPLES_VALUES,
         },
-        {
+        "GaussianMixture": {
             "cluster_algo": [GaussianMixture(random_state=SEED)],
             "cluster_algo__n_components": K_VALUES,
             "cluster_algo__covariance_type": COVARIANCE_TYPE_VALUES,
         },
-        *[
+        "SOM": [
             {
                 "cluster_algo": [SOM(random_state=SEED)],
                 "cluster_algo__n_cols": [k1],
@@ -296,12 +296,12 @@ def load_metabric_normed_param_grid() -> list[dict]:
             for k1, k2 in product([1] + list(K_VALUES), list(K_VALUES))
             if k1 * k2 <= max(K_VALUES)
         ],
-        {
+        "AffinityPropagation": {
             "cluster_algo": [AffinityPropagation(random_state=SEED)],
             "cluster_algo__damping": AFFINITY_PROP_DUMPING_VALUES,
             "cluster_algo__preference": AFFINITY_PROP_PREFERENCE_VALUES,
         },
-    ]
+    }
 
 
 # Scorer factories
