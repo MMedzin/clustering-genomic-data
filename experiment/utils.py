@@ -147,8 +147,8 @@ def load_gemler_normed_param_grid() -> list[dict]:
         *[
             {
                 "cluster_algo": [DBSCAN()],
-                "cluster_algo__eps": eps,
-                "cluster_algo__min_samples": min_samples,
+                "cluster_algo__eps": [eps],
+                "cluster_algo__min_samples": [min_samples],
             }
             for eps, min_samples in zip(EPS_VALUES, MIN_SAMPLES_VALUES)
         ],
@@ -164,8 +164,8 @@ def load_gemler_normed_param_grid() -> list[dict]:
         *[
             {
                 "cluster_algo": [SOM(random_state=SEED)],
-                "cluster_algo__n_cols": k1,
-                "cluster_algo__n_rows": k2,
+                "cluster_algo__n_cols": [k1],
+                "cluster_algo__n_rows": [k2],
                 "cluster_algo__initialcodebook": SOM_INITIALCODEBOOK_VALUES,
                 "cluster_algo__neighborhood": SOM_NEIGHBORHOOD_VALUES,
             }
@@ -271,8 +271,8 @@ def load_metabric_normed_param_grid() -> list[dict]:
         *[
             {
                 "cluster_algo": [DBSCAN()],
-                "cluster_algo__eps": eps,
-                "cluster_algo__min_samples": min_samples,
+                "cluster_algo__eps": [eps],
+                "cluster_algo__min_samples": [min_samples],
             }
             for eps, min_samples in zip(EPS_VALUES, MIN_SAMPLES_VALUES)
         ],
@@ -288,8 +288,8 @@ def load_metabric_normed_param_grid() -> list[dict]:
         *[
             {
                 "cluster_algo": [SOM(random_state=SEED)],
-                "cluster_algo__n_cols": k1,
-                "cluster_algo__n_rows": k2,
+                "cluster_algo__n_cols": [k1],
+                "cluster_algo__n_rows": [k2],
                 "cluster_algo__initialcodebook": SOM_INITIALCODEBOOK_VALUES,
                 "cluster_algo__neighborhood": SOM_NEIGHBORHOOD_VALUES,
             }
