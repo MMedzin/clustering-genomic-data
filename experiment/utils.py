@@ -18,6 +18,7 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn_extra.cluster import KMedoids
 from somlearn.som import SOM
 import scipy.io as sio
+from itertools import product
 
 FILE_DIR = Path(__file__).parent
 DATASETS_PATH = FILE_DIR / "../datasets"
@@ -141,7 +142,7 @@ def load_gemler_normed_param_grid() -> list[dict]:
             "cluster_algo": [Birch()],
             "cluster_algo__threshold": BIRCH_THRESHOLD_VALUES,
             "cluster_algo__branching_factor": BIRCH_BRANCHING_FACTOR_VALUES,
-            "cluster_algo__n_clusters": K_VALUES + [None],
+            "cluster_algo__n_clusters": list(K_VALUES) + [None],
         },
         *[
             {
@@ -160,20 +161,17 @@ def load_gemler_normed_param_grid() -> list[dict]:
             "cluster_algo__n_components": K_VALUES,
             "cluster_algo__covariance_type": COVARIANCE_TYPE_VALUES,
         },
-        {
-            "cluster_algo": [SOM(random_state=SEED)],
-            "cluster_algo__n_cols": [1] + K_VALUES[:-1],
-            "cluster_algo__n_rows": K_VALUES,
-            "cluster_algo__initialcodebook": SOM_INITIALCODEBOOK_VALUES,
-            "cluster_algo__neighborhood": SOM_NEIGHBORHOOD_VALUES,
-        },
-        {
-            "cluster_algo": [SOM(random_state=SEED)],
-            "cluster_algo__n_cols": K_VALUES,
-            "cluster_algo__n_rows": [1] + K_VALUES[:-1],
-            "cluster_algo__initialcodebook": SOM_INITIALCODEBOOK_VALUES,
-            "cluster_algo__neighborhood": SOM_NEIGHBORHOOD_VALUES,
-        },
+        *[
+            {
+                "cluster_algo": [SOM(random_state=SEED)],
+                "cluster_algo__n_cols": k1,
+                "cluster_algo__n_rows": k2,
+                "cluster_algo__initialcodebook": SOM_INITIALCODEBOOK_VALUES,
+                "cluster_algo__neighborhood": SOM_NEIGHBORHOOD_VALUES,
+            }
+            for k1, k2 in product([1] + list(K_VALUES), list(K_VALUES))
+            if k1 * k2 <= max(K_VALUES)
+        ],
         {
             "cluster_algo": [AffinityPropagation(random_state=SEED)],
             "cluster_algo__damping": AFFINITY_PROP_DUMPING_VALUES,
@@ -287,20 +285,17 @@ def load_metabric_normed_param_grid() -> list[dict]:
             "cluster_algo__n_components": K_VALUES,
             "cluster_algo__covariance_type": COVARIANCE_TYPE_VALUES,
         },
-        {
-            "cluster_algo": [SOM(random_state=SEED)],
-            "cluster_algo__n_cols": [1] + K_VALUES[:-1],
-            "cluster_algo__n_rows": K_VALUES,
-            "cluster_algo__initialcodebook": SOM_INITIALCODEBOOK_VALUES,
-            "cluster_algo__neighborhood": SOM_NEIGHBORHOOD_VALUES,
-        },
-        {
-            "cluster_algo": [SOM(random_state=SEED)],
-            "cluster_algo__n_cols": K_VALUES,
-            "cluster_algo__n_rows": [1] + K_VALUES[:-1],
-            "cluster_algo__initialcodebook": SOM_INITIALCODEBOOK_VALUES,
-            "cluster_algo__neighborhood": SOM_NEIGHBORHOOD_VALUES,
-        },
+        *[
+            {
+                "cluster_algo": [SOM(random_state=SEED)],
+                "cluster_algo__n_cols": k1,
+                "cluster_algo__n_rows": k2,
+                "cluster_algo__initialcodebook": SOM_INITIALCODEBOOK_VALUES,
+                "cluster_algo__neighborhood": SOM_NEIGHBORHOOD_VALUES,
+            }
+            for k1, k2 in product([1] + list(K_VALUES), list(K_VALUES))
+            if k1 * k2 <= max(K_VALUES)
+        ],
         {
             "cluster_algo": [AffinityPropagation(random_state=SEED)],
             "cluster_algo__damping": AFFINITY_PROP_DUMPING_VALUES,
