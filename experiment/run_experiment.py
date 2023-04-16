@@ -94,7 +94,7 @@ def main() -> None:
                     results_df = pd.DataFrame(grid_search.cv_results_)
                     results_df["algo_name"] = algo_name
                     results_df.loc[
-                        ~results_df.columns.str.startswith("param_cluster_algo")
+                        :, ~results_df.columns.str.startswith("param_cluster_algo")
                     ].to_csv(
                         RESULTS_DIR / f"{name}_grid_search.csv",
                         mode="a",
