@@ -266,7 +266,7 @@ def load_metabric_normed_param_grid() -> list[dict]:
             "cluster_algo": [Birch()],
             "cluster_algo__threshold": BIRCH_THRESHOLD_VALUES,
             "cluster_algo__branching_factor": BIRCH_BRANCHING_FACTOR_VALUES,
-            "cluster_algo__n_clusters": K_VALUES + [None],
+            "cluster_algo__n_clusters": list(K_VALUES) + [None],
         },
         "DBSCAN": [
             {
