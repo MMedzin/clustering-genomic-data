@@ -88,14 +88,25 @@ def main() -> None:
             logging.info("%s was loaded.", name)
             logging.info("Running GridSearch for %s...", name)
             for i, (algo_name, algo_grid) in enumerate(param_grid_loader().items()):
-                grid_search = GridSearchCV(**get_grid_search_kwargs(algo_grid))
-                grid_search.fit(data, ground_truth_encoded)
-                logging.info("%s GridSearch done for %s.", name, algo_name)
-                pd.DataFrame(grid_search.cv_results_).to_csv(
-                    RESULTS_DIR / f"{name}_grid_search.csv",
-                    mode="a",
-                    header=(i == 0),
-                )
+                try:
+                    grid_search = GridSearchCV(**get_grid_search_kwargs(algo_grid))
+                    grid_search.fit(data, ground_truth_encoded)
+                    results_df = pd.DataFrame(grid_search.cv_results_)
+                    results_df["algo_name"] = algo_name
+                    results_df.loc[
+                        ~results_df.columns.str.startswith("param_cluster_algo")
+                    ].to_csv(
+                        RESULTS_DIR / f"{name}_grid_search.csv",
+                        mode="a",
+                        header=(i == 0),
+                    )
+                    logging.info("%s GridSearch done for %s.", name, algo_name)
+                except Exception as error:
+                    logging.critical(error, exc_info=True)
+                    logging.info(
+                        "%s GridSearch failed for %s. Skipping...", name, algo_name
+                    )
+                    continue
             logging.info("%s GridSearch results saved to csv.", name)
 
         except Exception as error:
