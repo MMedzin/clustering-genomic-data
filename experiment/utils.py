@@ -12,6 +12,7 @@ from sklearn.cluster import (
     AgglomerativeClustering,
     Birch,
     KMeans,
+    SpectralClustering,
 )
 from sklearn.mixture import GaussianMixture
 from sklearn.preprocessing import MinMaxScaler
@@ -66,7 +67,7 @@ def load_gemler_data_normed() -> tuple[pd.DataFrame, pd.Series]:
 
     data = min_max_norm_data(data)
 
-    return data, ground_truth
+    return data, ground_truth.map(lambda x: x.decode("utf-8"))
 
 
 def load_gemler_normed_param_grid() -> list[dict]:
@@ -84,27 +85,21 @@ def load_gemler_normed_param_grid() -> list[dict]:
         7.655654352291004,
         10.207539136388005,
         12.759423920485007,
-        15.311308704582007,
-        17.86319348867901,
-        20.41507827277601,
-        22.966963056873013,
-        25.518847840970015,
-        None,
     ]
     BIRCH_BRANCHING_FACTOR_VALUES = [5, 28, 52, 76, 100]
     EPS_VALUES = [
-        11.341329848106783,
-        11.486816627113882,
-        11.846150753235138,
-        12.158006371221862,
-        12.254926310818119,
-        12.419676247975286,
-        13.231431260708911,
-        13.312087805263985,
-        13.439523570889282,
-        13.547102734215585,
+        10.810481126126229,
+        11.42876822008078,
+        11.24727069231537,
+        11.659056346150447,
+        11.455016452632346,
+        11.189865257207094,
+        11.661372548192299,
+        11.715841369400247,
+        11.758441006716266,
+        11.819918622368519,
     ]
-    MIN_SAMPLES_VALUES = [5, 47, 89, 132, 174, 216, 259, 301, 343, 386]
+    MIN_SAMPLES_VALUES = [3, 6, 10, 14, 18, 22, 26, 30, 34, 38]
     COVARIANCE_TYPE_VALUES = ["full", "tied", "diag", "spherical"]
     SOM_INITIALCODEBOOK_VALUES = [None, "pca"]
     SOM_NEIGHBORHOOD_VALUES = ["gaussian", "bubble"]
@@ -177,6 +172,21 @@ def load_gemler_normed_param_grid() -> list[dict]:
             "cluster_algo__damping": AFFINITY_PROP_DUMPING_VALUES,
             "cluster_algo__preference": AFFINITY_PROP_PREFERENCE_VALUES,
         },
+        "SpectralClustering": [
+            {
+                "cluster_algo": [SpectralClustering(random_state=SEED)],
+                "cluster_algo__n_clusters": K_VALUES,
+                "cluster_algo__affinity": ["rbf"],
+                "cluster_algo__assign_labels": ["kmeans", "discretize", "cluster_qr"],
+            },
+            {
+                "cluster_algo": [SpectralClustering(random_state=SEED)],
+                "cluster_algo__n_clusters": K_VALUES,
+                "cluster_algo__affinity": ["nearest_neighbors"],
+                "cluster_algo__n_neighbors": MIN_SAMPLES_VALUES,
+                "cluster_algo__assign_labels": ["kmeans", "discretize", "cluster_qr"],
+            },
+        ],
     }
 
 
@@ -207,28 +217,22 @@ def load_metabric_normed_param_grid() -> list[dict]:
         10.22887424001313,
         15.343311360019696,
         20.45774848002626,
-        25.572185600032824,
-        30.68662272003939,
-        35.80105984004596,
-        40.91549696005252,
-        46.029934080059085,
-        51.144371200065656,
-        None,
+        25.572185600032828,
     ]
     BIRCH_BRANCHING_FACTOR_VALUES = [5, 28, 52, 76, 100]
     EPS_VALUES = [
         20.69517473682061,
-        22.48498912238429,
-        23.302572442900274,
-        23.155692960768324,
-        23.507704506746776,
-        23.648092851552313,
-        24.07875065144159,
-        24.182767571342755,
-        24.34726259428857,
-        24.46377826606799,
+        21.424819891686553,
+        21.65635555044067,
+        21.943242935651888,
+        22.04489489265609,
+        22.053542447540618,
+        22.23324254655041,
+        22.33930803401733,
+        22.522489554319662,
+        22.621118201430036,
     ]
-    MIN_SAMPLES_VALUES = [5, 63, 122, 181, 239, 298, 357, 415, 474, 533]
+    MIN_SAMPLES_VALUES = [5, 10, 15, 21, 26, 31, 37, 42, 47, 53]
     COVARIANCE_TYPE_VALUES = ["full", "tied", "diag", "spherical"]
     SOM_INITIALCODEBOOK_VALUES = [None, "pca"]
     SOM_NEIGHBORHOOD_VALUES = ["gaussian", "bubble"]
@@ -301,6 +305,21 @@ def load_metabric_normed_param_grid() -> list[dict]:
             "cluster_algo__damping": AFFINITY_PROP_DUMPING_VALUES,
             "cluster_algo__preference": AFFINITY_PROP_PREFERENCE_VALUES,
         },
+        "SpectralClustering": [
+            {
+                "cluster_algo": [SpectralClustering(random_state=SEED)],
+                "cluster_algo__n_clusters": K_VALUES,
+                "cluster_algo__affinity": ["rbf"],
+                "cluster_algo__assign_labels": ["kmeans", "discretize", "cluster_qr"],
+            },
+            {
+                "cluster_algo": [SpectralClustering(random_state=SEED)],
+                "cluster_algo__n_clusters": K_VALUES,
+                "cluster_algo__affinity": ["nearest_neighbors"],
+                "cluster_algo__n_neighbors": MIN_SAMPLES_VALUES,
+                "cluster_algo__assign_labels": ["kmeans", "discretize", "cluster_qr"],
+            },
+        ],
     }
 
 
