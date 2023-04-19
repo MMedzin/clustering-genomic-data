@@ -159,7 +159,7 @@ def load_gemler_normed_param_grid() -> list[dict]:
         "SOM": [
             {
                 "cluster_algo": [SOM(random_state=SEED)],
-                "cluster_algo__n_cols": [k1],
+                "cluster_algo__n_columns": [k1],
                 "cluster_algo__n_rows": [k2],
                 "cluster_algo__initialcodebook": SOM_INITIALCODEBOOK_VALUES,
                 "cluster_algo__neighborhood": SOM_NEIGHBORHOOD_VALUES,
@@ -292,7 +292,7 @@ def load_metabric_normed_param_grid() -> list[dict]:
         "SOM": [
             {
                 "cluster_algo": [SOM(random_state=SEED)],
-                "cluster_algo__n_cols": [k1],
+                "cluster_algo__n_columns": [k1],
                 "cluster_algo__n_rows": [k2],
                 "cluster_algo__initialcodebook": SOM_INITIALCODEBOOK_VALUES,
                 "cluster_algo__neighborhood": SOM_NEIGHBORHOOD_VALUES,
