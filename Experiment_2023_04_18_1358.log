@@ -1,0 +1,327 @@
+13:58:47,180 root INFO Starting experiment...
+13:58:47,180 root INFO Loading GEMLER data...
+13:58:54,922 root INFO GEMLER was loaded.
+13:58:54,922 root INFO Running GridSearch for GEMLER...
+14:02:13,336 root INFO GEMLER GridSearch done for KMeans.
+14:02:33,483 root INFO GEMLER GridSearch done for KMedoids.
+14:10:43,646 root INFO GEMLER GridSearch done for AgglomerativeClustering.
+14:35:44,664 root INFO GEMLER GridSearch done for Birch.
+14:36:09,266 root INFO GEMLER GridSearch done for DBSCAN.
+14:57:07,914 root INFO GEMLER GridSearch done for OPTICS.
+14:57:14,710 concurrent.futures ERROR exception calling callback for <Future at 0x7fb90bc2bf10 state=finished raised TerminatedWorkerError>
+Traceback (most recent call last):
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/externals/loky/_base.py", line 26, in _invoke_callbacks
+    callback(self)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/parallel.py", line 385, in __call__
+    self.parallel.dispatch_next()
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/parallel.py", line 834, in dispatch_next
+    if not self.dispatch_one_batch(self._original_iterator):
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/parallel.py", line 901, in dispatch_one_batch
+    self._dispatch(tasks)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/parallel.py", line 819, in _dispatch
+    job = self._backend.apply_async(batch, callback=cb)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/_parallel_backends.py", line 556, in apply_async
+    future = self._workers.submit(SafeFunction(func))
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/externals/loky/reusable_executor.py", line 176, in submit
+    return super().submit(fn, *args, **kwargs)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/externals/loky/process_executor.py", line 1129, in submit
+    raise self._flags.broken
+joblib.externals.loky.process_executor.TerminatedWorkerError: A worker process managed by the executor was unexpectedly terminated. This could be caused by a segmentation fault while calling the function or by an excessive memory usage causing the Operating System to kill the worker.
+
+The exit codes of the workers are {SIGKILL(-9)}
+14:57:20,575 root CRITICAL A worker process managed by the executor was unexpectedly terminated. This could be caused by a segmentation fault while calling the function or by an excessive memory usage causing the Operating System to kill the worker.
+
+The exit codes of the workers are {SIGKILL(-9)}
+Traceback (most recent call last):
+  File "/home/michal/clustering-genomic-data/experiment/run_experiment.py", line 93, in main
+    grid_search.fit(data, ground_truth_encoded)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/sklearn/model_selection/_search.py", line 874, in fit
+    self._run_search(evaluate_candidates)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/sklearn/model_selection/_search.py", line 1388, in _run_search
+    evaluate_candidates(ParameterGrid(self.param_grid))
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/sklearn/model_selection/_search.py", line 821, in evaluate_candidates
+    out = parallel(
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/sklearn/utils/parallel.py", line 63, in __call__
+    return super().__call__(iterable_with_config)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/parallel.py", line 1098, in __call__
+    self.retrieve()
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/parallel.py", line 975, in retrieve
+    self._output.extend(job.get(timeout=self.timeout))
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/_parallel_backends.py", line 567, in wrap_future_result
+    return future.result(timeout=timeout)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/concurrent/futures/_base.py", line 446, in result
+    return self.__get_result()
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/concurrent/futures/_base.py", line 391, in __get_result
+    raise self._exception
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/externals/loky/_base.py", line 26, in _invoke_callbacks
+    callback(self)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/parallel.py", line 385, in __call__
+    self.parallel.dispatch_next()
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/parallel.py", line 834, in dispatch_next
+    if not self.dispatch_one_batch(self._original_iterator):
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/parallel.py", line 901, in dispatch_one_batch
+    self._dispatch(tasks)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/parallel.py", line 819, in _dispatch
+    job = self._backend.apply_async(batch, callback=cb)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/_parallel_backends.py", line 556, in apply_async
+    future = self._workers.submit(SafeFunction(func))
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/externals/loky/reusable_executor.py", line 176, in submit
+    return super().submit(fn, *args, **kwargs)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/externals/loky/process_executor.py", line 1129, in submit
+    raise self._flags.broken
+joblib.externals.loky.process_executor.TerminatedWorkerError: A worker process managed by the executor was unexpectedly terminated. This could be caused by a segmentation fault while calling the function or by an excessive memory usage causing the Operating System to kill the worker.
+
+The exit codes of the workers are {SIGKILL(-9)}
+14:57:20,589 root INFO GEMLER GridSearch failed for GaussianMixture. Skipping...
+14:57:24,548 root CRITICAL Invalid parameter 'n_cols' for estimator SOM(random_state=23). Valid parameters are: ['compactsupport', 'gridtype', 'initialcodebook', 'kerneltype', 'maptype', 'n_columns', 'n_rows', 'neighborhood', 'random_state', 'std_coeff', 'verbose'].
+joblib.externals.loky.process_executor._RemoteTraceback: 
+"""
+Traceback (most recent call last):
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/externals/loky/process_executor.py", line 428, in _process_worker
+    r = call_item()
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/externals/loky/process_executor.py", line 275, in __call__
+    return self.fn(*self.args, **self.kwargs)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/_parallel_backends.py", line 620, in __call__
+    return self.func(*args, **kwargs)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/parallel.py", line 288, in __call__
+    return [func(*args, **kwargs)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/parallel.py", line 288, in <listcomp>
+    return [func(*args, **kwargs)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/sklearn/utils/parallel.py", line 123, in __call__
+    return self.function(*args, **kwargs)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/sklearn/model_selection/_validation.py", line 674, in _fit_and_score
+    estimator = estimator.set_params(**cloned_parameters)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/sklearn/pipeline.py", line 211, in set_params
+    self._set_params("steps", **kwargs)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/sklearn/utils/metaestimators.py", line 70, in _set_params
+    super().set_params(**params)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/sklearn/base.py", line 236, in set_params
+    valid_params[key].set_params(**sub_params)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/sklearn/base.py", line 205, in set_params
+    raise ValueError(
+ValueError: Invalid parameter 'n_cols' for estimator SOM(random_state=23). Valid parameters are: ['compactsupport', 'gridtype', 'initialcodebook', 'kerneltype', 'maptype', 'n_columns', 'n_rows', 'neighborhood', 'random_state', 'std_coeff', 'verbose'].
+"""
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/michal/clustering-genomic-data/experiment/run_experiment.py", line 93, in main
+    grid_search.fit(data, ground_truth_encoded)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/sklearn/model_selection/_search.py", line 874, in fit
+    self._run_search(evaluate_candidates)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/sklearn/model_selection/_search.py", line 1388, in _run_search
+    evaluate_candidates(ParameterGrid(self.param_grid))
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/sklearn/model_selection/_search.py", line 821, in evaluate_candidates
+    out = parallel(
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/sklearn/utils/parallel.py", line 63, in __call__
+    return super().__call__(iterable_with_config)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/parallel.py", line 1098, in __call__
+    self.retrieve()
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/parallel.py", line 975, in retrieve
+    self._output.extend(job.get(timeout=self.timeout))
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/_parallel_backends.py", line 567, in wrap_future_result
+    return future.result(timeout=timeout)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/concurrent/futures/_base.py", line 446, in result
+    return self.__get_result()
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/concurrent/futures/_base.py", line 391, in __get_result
+    raise self._exception
+ValueError: Invalid parameter 'n_cols' for estimator SOM(random_state=23). Valid parameters are: ['compactsupport', 'gridtype', 'initialcodebook', 'kerneltype', 'maptype', 'n_columns', 'n_rows', 'neighborhood', 'random_state', 'std_coeff', 'verbose'].
+14:57:24,548 root INFO GEMLER GridSearch failed for SOM. Skipping...
+15:02:02,547 root INFO GEMLER GridSearch done for AffinityPropagation.
+17:30:43,811 root INFO GEMLER GridSearch done for SpectralClustering.
+17:30:43,811 root INFO GEMLER GridSearch results saved to csv.
+17:30:43,811 root INFO Loading METABRIC data...
+17:30:46,726 root INFO METABRIC was loaded.
+17:30:46,726 root INFO Running GridSearch for METABRIC...
+17:52:33,98 root INFO METABRIC GridSearch done for KMeans.
+17:54:14,225 root INFO METABRIC GridSearch done for KMedoids.
+18:54:06,416 root INFO METABRIC GridSearch done for AgglomerativeClustering.
+18:54:57,676 concurrent.futures ERROR exception calling callback for <Future at 0x7fb8fd4f1130 state=finished raised TerminatedWorkerError>
+Traceback (most recent call last):
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/externals/loky/_base.py", line 26, in _invoke_callbacks
+    callback(self)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/parallel.py", line 385, in __call__
+    self.parallel.dispatch_next()
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/parallel.py", line 834, in dispatch_next
+    if not self.dispatch_one_batch(self._original_iterator):
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/parallel.py", line 901, in dispatch_one_batch
+    self._dispatch(tasks)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/parallel.py", line 819, in _dispatch
+    job = self._backend.apply_async(batch, callback=cb)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/_parallel_backends.py", line 556, in apply_async
+    future = self._workers.submit(SafeFunction(func))
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/externals/loky/reusable_executor.py", line 176, in submit
+    return super().submit(fn, *args, **kwargs)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/externals/loky/process_executor.py", line 1129, in submit
+    raise self._flags.broken
+joblib.externals.loky.process_executor.TerminatedWorkerError: A worker process managed by the executor was unexpectedly terminated. This could be caused by a segmentation fault while calling the function or by an excessive memory usage causing the Operating System to kill the worker.
+
+The exit codes of the workers are {SIGKILL(-9)}
+18:55:02,766 root CRITICAL A worker process managed by the executor was unexpectedly terminated. This could be caused by a segmentation fault while calling the function or by an excessive memory usage causing the Operating System to kill the worker.
+
+The exit codes of the workers are {SIGKILL(-9)}
+Traceback (most recent call last):
+  File "/home/michal/clustering-genomic-data/experiment/run_experiment.py", line 93, in main
+    grid_search.fit(data, ground_truth_encoded)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/sklearn/model_selection/_search.py", line 874, in fit
+    self._run_search(evaluate_candidates)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/sklearn/model_selection/_search.py", line 1388, in _run_search
+    evaluate_candidates(ParameterGrid(self.param_grid))
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/sklearn/model_selection/_search.py", line 821, in evaluate_candidates
+    out = parallel(
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/sklearn/utils/parallel.py", line 63, in __call__
+    return super().__call__(iterable_with_config)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/parallel.py", line 1098, in __call__
+    self.retrieve()
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/parallel.py", line 975, in retrieve
+    self._output.extend(job.get(timeout=self.timeout))
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/_parallel_backends.py", line 567, in wrap_future_result
+    return future.result(timeout=timeout)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/concurrent/futures/_base.py", line 446, in result
+    return self.__get_result()
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/concurrent/futures/_base.py", line 391, in __get_result
+    raise self._exception
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/externals/loky/_base.py", line 26, in _invoke_callbacks
+    callback(self)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/parallel.py", line 385, in __call__
+    self.parallel.dispatch_next()
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/parallel.py", line 834, in dispatch_next
+    if not self.dispatch_one_batch(self._original_iterator):
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/parallel.py", line 901, in dispatch_one_batch
+    self._dispatch(tasks)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/parallel.py", line 819, in _dispatch
+    job = self._backend.apply_async(batch, callback=cb)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/_parallel_backends.py", line 556, in apply_async
+    future = self._workers.submit(SafeFunction(func))
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/externals/loky/reusable_executor.py", line 176, in submit
+    return super().submit(fn, *args, **kwargs)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/externals/loky/process_executor.py", line 1129, in submit
+    raise self._flags.broken
+joblib.externals.loky.process_executor.TerminatedWorkerError: A worker process managed by the executor was unexpectedly terminated. This could be caused by a segmentation fault while calling the function or by an excessive memory usage causing the Operating System to kill the worker.
+
+The exit codes of the workers are {SIGKILL(-9)}
+18:55:02,771 root INFO METABRIC GridSearch failed for Birch. Skipping...
+18:56:41,28 root INFO METABRIC GridSearch done for DBSCAN.
+20:27:28,453 root INFO METABRIC GridSearch done for OPTICS.
+20:27:39,325 concurrent.futures ERROR exception calling callback for <Future at 0x7fb909074610 state=finished raised TerminatedWorkerError>
+Traceback (most recent call last):
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/externals/loky/_base.py", line 26, in _invoke_callbacks
+    callback(self)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/parallel.py", line 385, in __call__
+    self.parallel.dispatch_next()
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/parallel.py", line 834, in dispatch_next
+    if not self.dispatch_one_batch(self._original_iterator):
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/parallel.py", line 901, in dispatch_one_batch
+    self._dispatch(tasks)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/parallel.py", line 819, in _dispatch
+    job = self._backend.apply_async(batch, callback=cb)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/_parallel_backends.py", line 556, in apply_async
+    future = self._workers.submit(SafeFunction(func))
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/externals/loky/reusable_executor.py", line 176, in submit
+    return super().submit(fn, *args, **kwargs)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/externals/loky/process_executor.py", line 1129, in submit
+    raise self._flags.broken
+joblib.externals.loky.process_executor.TerminatedWorkerError: A worker process managed by the executor was unexpectedly terminated. This could be caused by a segmentation fault while calling the function or by an excessive memory usage causing the Operating System to kill the worker.
+
+The exit codes of the workers are {SIGKILL(-9)}
+20:27:43,918 root CRITICAL A worker process managed by the executor was unexpectedly terminated. This could be caused by a segmentation fault while calling the function or by an excessive memory usage causing the Operating System to kill the worker.
+
+The exit codes of the workers are {SIGKILL(-9)}
+Traceback (most recent call last):
+  File "/home/michal/clustering-genomic-data/experiment/run_experiment.py", line 93, in main
+    grid_search.fit(data, ground_truth_encoded)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/sklearn/model_selection/_search.py", line 874, in fit
+    self._run_search(evaluate_candidates)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/sklearn/model_selection/_search.py", line 1388, in _run_search
+    evaluate_candidates(ParameterGrid(self.param_grid))
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/sklearn/model_selection/_search.py", line 821, in evaluate_candidates
+    out = parallel(
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/sklearn/utils/parallel.py", line 63, in __call__
+    return super().__call__(iterable_with_config)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/parallel.py", line 1098, in __call__
+    self.retrieve()
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/parallel.py", line 975, in retrieve
+    self._output.extend(job.get(timeout=self.timeout))
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/_parallel_backends.py", line 567, in wrap_future_result
+    return future.result(timeout=timeout)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/concurrent/futures/_base.py", line 446, in result
+    return self.__get_result()
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/concurrent/futures/_base.py", line 391, in __get_result
+    raise self._exception
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/externals/loky/_base.py", line 26, in _invoke_callbacks
+    callback(self)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/parallel.py", line 385, in __call__
+    self.parallel.dispatch_next()
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/parallel.py", line 834, in dispatch_next
+    if not self.dispatch_one_batch(self._original_iterator):
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/parallel.py", line 901, in dispatch_one_batch
+    self._dispatch(tasks)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/parallel.py", line 819, in _dispatch
+    job = self._backend.apply_async(batch, callback=cb)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/_parallel_backends.py", line 556, in apply_async
+    future = self._workers.submit(SafeFunction(func))
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/externals/loky/reusable_executor.py", line 176, in submit
+    return super().submit(fn, *args, **kwargs)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/externals/loky/process_executor.py", line 1129, in submit
+    raise self._flags.broken
+joblib.externals.loky.process_executor.TerminatedWorkerError: A worker process managed by the executor was unexpectedly terminated. This could be caused by a segmentation fault while calling the function or by an excessive memory usage causing the Operating System to kill the worker.
+
+The exit codes of the workers are {SIGKILL(-9)}
+20:27:43,925 root INFO METABRIC GridSearch failed for GaussianMixture. Skipping...
+20:27:49,674 root CRITICAL Invalid parameter 'n_cols' for estimator SOM(random_state=23). Valid parameters are: ['compactsupport', 'gridtype', 'initialcodebook', 'kerneltype', 'maptype', 'n_columns', 'n_rows', 'neighborhood', 'random_state', 'std_coeff', 'verbose'].
+joblib.externals.loky.process_executor._RemoteTraceback: 
+"""
+Traceback (most recent call last):
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/externals/loky/process_executor.py", line 428, in _process_worker
+    r = call_item()
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/externals/loky/process_executor.py", line 275, in __call__
+    return self.fn(*self.args, **self.kwargs)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/_parallel_backends.py", line 620, in __call__
+    return self.func(*args, **kwargs)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/parallel.py", line 288, in __call__
+    return [func(*args, **kwargs)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/parallel.py", line 288, in <listcomp>
+    return [func(*args, **kwargs)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/sklearn/utils/parallel.py", line 123, in __call__
+    return self.function(*args, **kwargs)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/sklearn/model_selection/_validation.py", line 674, in _fit_and_score
+    estimator = estimator.set_params(**cloned_parameters)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/sklearn/pipeline.py", line 211, in set_params
+    self._set_params("steps", **kwargs)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/sklearn/utils/metaestimators.py", line 70, in _set_params
+    super().set_params(**params)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/sklearn/base.py", line 236, in set_params
+    valid_params[key].set_params(**sub_params)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/sklearn/base.py", line 205, in set_params
+    raise ValueError(
+ValueError: Invalid parameter 'n_cols' for estimator SOM(random_state=23). Valid parameters are: ['compactsupport', 'gridtype', 'initialcodebook', 'kerneltype', 'maptype', 'n_columns', 'n_rows', 'neighborhood', 'random_state', 'std_coeff', 'verbose'].
+"""
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/michal/clustering-genomic-data/experiment/run_experiment.py", line 93, in main
+    grid_search.fit(data, ground_truth_encoded)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/sklearn/model_selection/_search.py", line 874, in fit
+    self._run_search(evaluate_candidates)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/sklearn/model_selection/_search.py", line 1388, in _run_search
+    evaluate_candidates(ParameterGrid(self.param_grid))
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/sklearn/model_selection/_search.py", line 821, in evaluate_candidates
+    out = parallel(
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/sklearn/utils/parallel.py", line 63, in __call__
+    return super().__call__(iterable_with_config)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/parallel.py", line 1098, in __call__
+    self.retrieve()
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/parallel.py", line 975, in retrieve
+    self._output.extend(job.get(timeout=self.timeout))
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/_parallel_backends.py", line 567, in wrap_future_result
+    return future.result(timeout=timeout)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/concurrent/futures/_base.py", line 446, in result
+    return self.__get_result()
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/concurrent/futures/_base.py", line 391, in __get_result
+    raise self._exception
+ValueError: Invalid parameter 'n_cols' for estimator SOM(random_state=23). Valid parameters are: ['compactsupport', 'gridtype', 'initialcodebook', 'kerneltype', 'maptype', 'n_columns', 'n_rows', 'neighborhood', 'random_state', 'std_coeff', 'verbose'].
+20:27:49,675 root INFO METABRIC GridSearch failed for SOM. Skipping...
+20:36:43,162 root INFO METABRIC GridSearch done for AffinityPropagation.
+08:54:03,469 root INFO METABRIC GridSearch done for SpectralClustering.
+08:54:03,470 root INFO METABRIC GridSearch results saved to csv.
