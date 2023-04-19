@@ -12,6 +12,7 @@ from sklearn.cluster import (
     AgglomerativeClustering,
     Birch,
     KMeans,
+    SpectralClustering,
 )
 from sklearn_extra.cluster import KMedoids
 from sklearn.decomposition import PCA
