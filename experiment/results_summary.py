@@ -56,9 +56,11 @@ def boxplot_scores_per_best_config(results_df: pd.DataFrame, save_path: Path) ->
     n_cols = 3
     n_rows = int(len(SCORES) // n_cols + 1 * (len(SCORES) % n_cols > 0))
     fig = plt.figure(figsize=(n_rows * 10, n_cols * 5))
-    for n, (score, _) in enumerate(SCORES):
+    for n, (score, transform_func) in enumerate(SCORES):
         max_ids = (
-            results_df.groupby("algo_name")[f"mean_test_{score}"].transform(max)
+            results_df.groupby("algo_name")[f"mean_test_{score}"].transform(
+                transform_func
+            )
             == results_df.loc[:, f"mean_test_{score}"]
         )
         max_results_df = (
