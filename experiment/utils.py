@@ -16,6 +16,7 @@ from sklearn.cluster import (
 )
 from sklearn.mixture import GaussianMixture
 from sklearn.preprocessing import MinMaxScaler
+from sklearn.base import TransformerMixin
 from sklearn_extra.cluster import KMedoids
 from somlearn.som import SOM
 import scipy.io as sio
@@ -30,44 +31,50 @@ SEED = 23
 # Data Loaders
 
 
-def min_max_norm_data(data: pd.DataFrame) -> pd.DataFrame:
+def norm_data(
+    data: pd.DataFrame, scaler: TransformerMixin = MinMaxScaler()
+) -> pd.DataFrame:
     return pd.DataFrame(
-        MinMaxScaler().fit_transform(data), columns=data.columns, index=data.index
+        scaler.fit_transform(data), columns=data.columns, index=data.index
     )
 
+    # GEMLER
 
-# GEMLER
-def load_gemler_data_normed() -> tuple[pd.DataFrame, pd.Series]:
-    data = pd.concat(
-        [
-            pd.DataFrame(loadarff(DATASETS_PATH / "AP_Breast_Ovary.arff")[0]).set_index(
-                "ID_REF"
-            ),
-            pd.DataFrame(loadarff(DATASETS_PATH / "AP_Colon_Kidney.arff")[0]).set_index(
-                "ID_REF"
-            ),
-            pd.DataFrame(
-                loadarff(DATASETS_PATH / "AP_Endometrium_Prostate.arff")[0]
-            ).set_index("ID_REF"),
-            pd.DataFrame(loadarff(DATASETS_PATH / "AP_Omentum_Lung.arff")[0]).set_index(
-                "ID_REF"
-            ),
-            pd.DataFrame(
-                loadarff(DATASETS_PATH / "AP_Prostate_Uterus.arff")[0]
-            ).set_index("ID_REF"),
-        ]
-    )
-    data = data.dropna(
-        how="any", axis="columns"
-    )  # Keep only genes common in all datasets
-    data = data.loc[~data.index.duplicated()]  # Drop duplicates of Prostate samples
 
-    ground_truth = data.loc[:, "Tissue"]
-    data = data.drop(columns="Tissue")
+def load_gemler_data_normed(scaler: TransformerMixin = MinMaxScaler()) -> Callable:
+    def loader_func() -> tuple[pd.DataFrame, pd.Series]:
+        data = pd.concat(
+            [
+                pd.DataFrame(
+                    loadarff(DATASETS_PATH / "AP_Breast_Ovary.arff")[0]
+                ).set_index("ID_REF"),
+                pd.DataFrame(
+                    loadarff(DATASETS_PATH / "AP_Colon_Kidney.arff")[0]
+                ).set_index("ID_REF"),
+                pd.DataFrame(
+                    loadarff(DATASETS_PATH / "AP_Endometrium_Prostate.arff")[0]
+                ).set_index("ID_REF"),
+                pd.DataFrame(
+                    loadarff(DATASETS_PATH / "AP_Omentum_Lung.arff")[0]
+                ).set_index("ID_REF"),
+                pd.DataFrame(
+                    loadarff(DATASETS_PATH / "AP_Prostate_Uterus.arff")[0]
+                ).set_index("ID_REF"),
+            ]
+        )
+        data = data.dropna(
+            how="any", axis="columns"
+        )  # Keep only genes common in all datasets
+        data = data.loc[~data.index.duplicated()]  # Drop duplicates of Prostate samples
 
-    data = min_max_norm_data(data)
+        ground_truth = data.loc[:, "Tissue"]
+        data = data.drop(columns="Tissue")
 
-    return data, ground_truth.map(lambda x: x.decode("utf-8"))
+        data = norm_data(data, scaler=scaler)
+
+        return data, ground_truth.map(lambda x: x.decode("utf-8"))
+
+    return loader_func
 
 
 def load_gemler_normed_param_grid() -> list[dict]:
@@ -133,40 +140,40 @@ def load_gemler_normed_param_grid() -> list[dict]:
             "cluster_algo__n_clusters": K_VALUES,
             "cluster_algo__linkage": LINKAGE_VALUES,
         },
-        "Birch": {
-            "cluster_algo": [Birch()],
-            "cluster_algo__threshold": BIRCH_THRESHOLD_VALUES,
-            "cluster_algo__branching_factor": BIRCH_BRANCHING_FACTOR_VALUES,
-            "cluster_algo__n_clusters": list(K_VALUES) + [None],
-        },
-        "DBSCAN": [
-            {
-                "cluster_algo": [DBSCAN()],
-                "cluster_algo__eps": [eps],
-                "cluster_algo__min_samples": [min_samples],
-            }
-            for eps, min_samples in zip(EPS_VALUES, MIN_SAMPLES_VALUES)
-        ],
-        "OPTICS": {
-            "cluster_algo": [OPTICS(cluster_method="dbscan")],
-            "cluster_algo__min_samples": MIN_SAMPLES_VALUES,
-        },
-        "GaussianMixture": {
-            "cluster_algo": [GaussianMixture(random_state=SEED)],
-            "cluster_algo__n_components": K_VALUES,
-            "cluster_algo__covariance_type": COVARIANCE_TYPE_VALUES,
-        },
-        "SOM": [
-            {
-                "cluster_algo": [SOM(random_state=SEED)],
-                "cluster_algo__n_columns": [k1],
-                "cluster_algo__n_rows": [k2],
-                "cluster_algo__initialcodebook": SOM_INITIALCODEBOOK_VALUES,
-                "cluster_algo__neighborhood": SOM_NEIGHBORHOOD_VALUES,
-            }
-            for k1, k2 in product([1] + list(K_VALUES), list(K_VALUES))
-            if k1 * k2 <= max(K_VALUES)
-        ],
+        # "Birch": {
+        #     "cluster_algo": [Birch()],
+        #     "cluster_algo__threshold": BIRCH_THRESHOLD_VALUES,
+        #     "cluster_algo__branching_factor": BIRCH_BRANCHING_FACTOR_VALUES,
+        #     "cluster_algo__n_clusters": list(K_VALUES) + [None],
+        # },
+        # "DBSCAN": [
+        #     {
+        #         "cluster_algo": [DBSCAN()],
+        #         "cluster_algo__eps": [eps],
+        #         "cluster_algo__min_samples": [min_samples],
+        #     }
+        #     for eps, min_samples in zip(EPS_VALUES, MIN_SAMPLES_VALUES)
+        # ],
+        # "OPTICS": {
+        #     "cluster_algo": [OPTICS(cluster_method="dbscan")],
+        #     "cluster_algo__min_samples": MIN_SAMPLES_VALUES,
+        # },
+        # "GaussianMixture": {
+        #     "cluster_algo": [GaussianMixture(random_state=SEED)],
+        #     "cluster_algo__n_components": K_VALUES,
+        #     "cluster_algo__covariance_type": COVARIANCE_TYPE_VALUES,
+        # },
+        # "SOM": [
+        #     {
+        #         "cluster_algo": [SOM(random_state=SEED)],
+        #         "cluster_algo__n_columns": [k1],
+        #         "cluster_algo__n_rows": [k2],
+        #         "cluster_algo__initialcodebook": SOM_INITIALCODEBOOK_VALUES,
+        #         "cluster_algo__neighborhood": SOM_NEIGHBORHOOD_VALUES,
+        #     }
+        #     for k1, k2 in product([1] + list(K_VALUES), list(K_VALUES))
+        #     if k1 * k2 <= max(K_VALUES)
+        # ],
         "AffinityPropagation": {
             "cluster_algo": [AffinityPropagation(random_state=SEED)],
             "cluster_algo__damping": AFFINITY_PROP_DUMPING_VALUES,
@@ -191,16 +198,21 @@ def load_gemler_normed_param_grid() -> list[dict]:
 
 
 # METABRIC
-def load_metabric_data_normed() -> tuple[pd.DataFrame, pd.Series]:
-    data_mat = sio.loadmat(DATASETS_PATH / "BRCA1View20000.mat")
-    data = pd.DataFrame(data_mat["data"]).transpose()
-    data.index = data_mat["id"][0]
-    data.columns = map(lambda x: x[0], data_mat["gene"][0])
-    ground_truth = pd.Series(data_mat["targets"][:, 0], index=data.index)
+def load_metabric_data_normed(
+    scaler: TransformerMixin = MinMaxScaler(),
+) -> Callable:
+    def loader_func() -> tuple[pd.DataFrame, pd.Series]:
+        data_mat = sio.loadmat(DATASETS_PATH / "BRCA1View20000.mat")
+        data = pd.DataFrame(data_mat["data"]).transpose()
+        data.index = data_mat["id"][0]
+        data.columns = map(lambda x: x[0], data_mat["gene"][0])
+        ground_truth = pd.Series(data_mat["targets"][:, 0], index=data.index)
 
-    data = min_max_norm_data(data)
+        data = norm_data(data, scaler=scaler)
 
-    return data, ground_truth
+        return data, ground_truth
+
+    return loader_func
 
 
 def load_metabric_normed_param_grid() -> list[dict]:
@@ -266,40 +278,40 @@ def load_metabric_normed_param_grid() -> list[dict]:
             "cluster_algo__n_clusters": K_VALUES,
             "cluster_algo__linkage": LINKAGE_VALUES,
         },
-        "Birch": {
-            "cluster_algo": [Birch()],
-            "cluster_algo__threshold": BIRCH_THRESHOLD_VALUES,
-            "cluster_algo__branching_factor": BIRCH_BRANCHING_FACTOR_VALUES,
-            "cluster_algo__n_clusters": list(K_VALUES) + [None],
-        },
-        "DBSCAN": [
-            {
-                "cluster_algo": [DBSCAN()],
-                "cluster_algo__eps": [eps],
-                "cluster_algo__min_samples": [min_samples],
-            }
-            for eps, min_samples in zip(EPS_VALUES, MIN_SAMPLES_VALUES)
-        ],
-        "OPTICS": {
-            "cluster_algo": [OPTICS(cluster_method="dbscan")],
-            "cluster_algo__min_samples": MIN_SAMPLES_VALUES,
-        },
-        "GaussianMixture": {
-            "cluster_algo": [GaussianMixture(random_state=SEED)],
-            "cluster_algo__n_components": K_VALUES,
-            "cluster_algo__covariance_type": COVARIANCE_TYPE_VALUES,
-        },
-        "SOM": [
-            {
-                "cluster_algo": [SOM(random_state=SEED)],
-                "cluster_algo__n_columns": [k1],
-                "cluster_algo__n_rows": [k2],
-                "cluster_algo__initialcodebook": SOM_INITIALCODEBOOK_VALUES,
-                "cluster_algo__neighborhood": SOM_NEIGHBORHOOD_VALUES,
-            }
-            for k1, k2 in product([1] + list(K_VALUES), list(K_VALUES))
-            if k1 * k2 <= max(K_VALUES)
-        ],
+        # "Birch": {
+        #     "cluster_algo": [Birch()],
+        #     "cluster_algo__threshold": BIRCH_THRESHOLD_VALUES,
+        #     "cluster_algo__branching_factor": BIRCH_BRANCHING_FACTOR_VALUES,
+        #     "cluster_algo__n_clusters": list(K_VALUES) + [None],
+        # },
+        # "DBSCAN": [
+        #     {
+        #         "cluster_algo": [DBSCAN()],
+        #         "cluster_algo__eps": [eps],
+        #         "cluster_algo__min_samples": [min_samples],
+        #     }
+        #     for eps, min_samples in zip(EPS_VALUES, MIN_SAMPLES_VALUES)
+        # ],
+        # "OPTICS": {
+        #     "cluster_algo": [OPTICS(cluster_method="dbscan")],
+        #     "cluster_algo__min_samples": MIN_SAMPLES_VALUES,
+        # },
+        # "GaussianMixture": {
+        #     "cluster_algo": [GaussianMixture(random_state=SEED)],
+        #     "cluster_algo__n_components": K_VALUES,
+        #     "cluster_algo__covariance_type": COVARIANCE_TYPE_VALUES,
+        # },
+        # "SOM": [
+        #     {
+        #         "cluster_algo": [SOM(random_state=SEED)],
+        #         "cluster_algo__n_columns": [k1],
+        #         "cluster_algo__n_rows": [k2],
+        #         "cluster_algo__initialcodebook": SOM_INITIALCODEBOOK_VALUES,
+        #         "cluster_algo__neighborhood": SOM_NEIGHBORHOOD_VALUES,
+        #     }
+        #     for k1, k2 in product([1] + list(K_VALUES), list(K_VALUES))
+        #     if k1 * k2 <= max(K_VALUES)
+        # ],
         "AffinityPropagation": {
             "cluster_algo": [AffinityPropagation(random_state=SEED)],
             "cluster_algo__damping": AFFINITY_PROP_DUMPING_VALUES,

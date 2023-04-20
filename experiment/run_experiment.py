@@ -21,6 +21,10 @@ from sklearn.metrics import (
     adjusted_mutual_info_score,
     adjusted_rand_score,
 )
+from sklearn.preprocessing import (
+    StandardScaler,
+    QuantileTransformer,
+)
 from pathlib import Path
 
 EXPERIMENT_DIR = Path(__file__).parent
@@ -38,9 +42,31 @@ logging.basicConfig(
 RESULTS_DIR = EXPERIMENT_DIR / f"results_{START_TIMESTAMP}"
 RESULTS_DIR.mkdir(exist_ok=True)
 
+# DATASETS = [
+#     ("GEMLER", load_gemler_data_normed, load_gemler_normed_param_grid()),
+#     ("METABRIC", load_metabric_data_normed, load_metabric_normed_param_grid()),
+# ]
 DATASETS = [
-    ("GEMLER", load_gemler_data_normed, load_gemler_normed_param_grid),
-    ("METABRIC", load_metabric_data_normed, load_metabric_normed_param_grid),
+    (
+        "GEMLER_StandardScaler",
+        load_gemler_data_normed,
+        load_gemler_normed_param_grid(StandardScaler()),
+    ),
+    (
+        "METABRIC_StandardScaler",
+        load_metabric_data_normed,
+        load_metabric_normed_param_grid(StandardScaler()),
+    ),
+    (
+        "GEMLER_QuantileScaler",
+        load_gemler_data_normed,
+        load_gemler_normed_param_grid(QuantileTransformer()),
+    ),
+    (
+        "METABRIC_QuantileScaler",
+        load_metabric_data_normed,
+        load_metabric_normed_param_grid(QuantileTransformer()),
+    ),
 ]
 
 CV_SPLITS = 2
