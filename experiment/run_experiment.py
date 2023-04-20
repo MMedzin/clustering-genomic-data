@@ -43,29 +43,29 @@ RESULTS_DIR = EXPERIMENT_DIR / f"results_{START_TIMESTAMP}"
 RESULTS_DIR.mkdir(exist_ok=True)
 
 # DATASETS = [
-#     ("GEMLER", load_gemler_data_normed, load_gemler_normed_param_grid()),
-#     ("METABRIC", load_metabric_data_normed, load_metabric_normed_param_grid()),
+#     ("GEMLER", load_gemler_data_normed(), load_gemler_normed_param_grid),
+#     ("METABRIC", load_metabric_data_normed(), load_metabric_normed_param_grid),
 # ]
 DATASETS = [
     (
         "GEMLER_StandardScaler",
-        load_gemler_data_normed,
-        load_gemler_normed_param_grid(StandardScaler()),
+        load_gemler_data_normed(StandardScaler()),
+        load_gemler_normed_param_grid,
     ),
     (
         "METABRIC_StandardScaler",
-        load_metabric_data_normed,
-        load_metabric_normed_param_grid(StandardScaler()),
+        load_metabric_data_normed(StandardScaler()),
+        load_metabric_normed_param_grid,
     ),
     (
         "GEMLER_QuantileScaler",
-        load_gemler_data_normed,
-        load_gemler_normed_param_grid(QuantileTransformer()),
+        load_gemler_data_normed(QuantileTransformer()),
+        load_gemler_normed_param_grid,
     ),
     (
         "METABRIC_QuantileScaler",
-        load_metabric_data_normed,
-        load_metabric_normed_param_grid(QuantileTransformer()),
+        load_metabric_data_normed(QuantileTransformer()),
+        load_metabric_normed_param_grid,
     ),
 ]
 
