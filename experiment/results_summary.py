@@ -17,12 +17,19 @@ from sklearn.cluster import (
 from sklearn_extra.cluster import KMedoids
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
+from sklearn.preprocessing import StandardScaler, QuantileTransformer
 from utils import load_gemler_data_normed, load_metabric_data_normed, SEED
 from tqdm.auto import tqdm
 
+# DATASETS = {
+#     "GEMLER": load_gemler_data_normed,
+#     "METABRIC": load_metabric_data_normed,
+# }
 DATASETS = {
-    "GEMLER": load_gemler_data_normed,
-    "METABRIC": load_metabric_data_normed,
+    "GEMLER_StandardScaler": load_gemler_data_normed(StandardScaler()),
+    "METABRIC_StandardScaler": load_metabric_data_normed(StandardScaler()),
+    "GEMLER_QuantileScaler": load_gemler_data_normed(QuantileTransformer()),
+    "METABRIC_QuantileScaler": load_metabric_data_normed(QuantileTransformer()),
 }
 SCORES = [
     ("silhouette", max),
