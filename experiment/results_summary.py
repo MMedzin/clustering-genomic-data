@@ -1,10 +1,10 @@
 from argparse import ArgumentParser
 from pathlib import Path
 from typing import Optional
+
+import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
-import matplotlib.pyplot as plt
-from umap import UMAP
 from sklearn.cluster import (
     DBSCAN,
     OPTICS,
@@ -14,23 +14,24 @@ from sklearn.cluster import (
     KMeans,
     SpectralClustering,
 )
-from sklearn_extra.cluster import KMedoids
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
-from sklearn.preprocessing import StandardScaler, QuantileTransformer
-from utils import load_gemler_data_normed, load_metabric_data_normed, SEED
+from sklearn.preprocessing import QuantileTransformer, StandardScaler
+from sklearn_extra.cluster import KMedoids
 from tqdm.auto import tqdm
+from umap import UMAP
+from utils import SEED, load_gemler_data_normed, load_metabric_data_normed
 
-# DATASETS = {
-#     "GEMLER": load_gemler_data_normed,
-#     "METABRIC": load_metabric_data_normed,
-# }
 DATASETS = {
-    "GEMLER_StandardScaler": load_gemler_data_normed(StandardScaler()),
-    "METABRIC_StandardScaler": load_metabric_data_normed(StandardScaler()),
-    "GEMLER_QuantileScaler": load_gemler_data_normed(QuantileTransformer()),
-    "METABRIC_QuantileScaler": load_metabric_data_normed(QuantileTransformer()),
+    "GEMLER": load_gemler_data_normed(),
+    "METABRIC": load_metabric_data_normed(),
 }
+# DATASETS = {
+#     "GEMLER_StandardScaler": load_gemler_data_normed(StandardScaler()),
+#     "METABRIC_StandardScaler": load_metabric_data_normed(StandardScaler()),
+#     "GEMLER_QuantileScaler": load_gemler_data_normed(QuantileTransformer()),
+#     "METABRIC_QuantileScaler": load_metabric_data_normed(QuantileTransformer()),
+# }
 SCORES = [
     ("silhouette", max),
     ("calinski_harabasz", max),
@@ -163,7 +164,9 @@ def main(results_dir: Path, datasets: list[str]) -> None:
         data_df, ground_truth = DATASETS[dataset]()
 
         embedding = pd.DataFrame(
-            TSNE(n_components=2, random_state=SEED).fit_transform(data_df),
+            TSNE(
+                n_components=2, random_state=SEED, perplexity=30, metric="manhattan"
+            ).fit_transform(data_df),
             index=data_df.index,
             columns=["x", "y"],
         )

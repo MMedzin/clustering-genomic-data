@@ -1,5 +1,19 @@
+import logging
+from datetime import datetime
+from pathlib import Path
 from typing import Union
+
 import pandas as pd
+from sklearn.metrics import (
+    adjusted_mutual_info_score,
+    adjusted_rand_score,
+    calinski_harabasz_score,
+    davies_bouldin_score,
+    silhouette_score,
+)
+from sklearn.model_selection import GridSearchCV, RepeatedStratifiedKFold
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import LabelEncoder, QuantileTransformer, StandardScaler
 from utils import (
     SEED,
     load_gemler_data_normed,
@@ -9,23 +23,6 @@ from utils import (
     make_clustering_scorer_supervised,
     make_clustering_scorer_unsupervised,
 )
-from sklearn.model_selection import GridSearchCV, RepeatedStratifiedKFold
-import logging
-from datetime import datetime
-from sklearn.preprocessing import LabelEncoder
-from sklearn.pipeline import Pipeline
-from sklearn.metrics import (
-    silhouette_score,
-    calinski_harabasz_score,
-    davies_bouldin_score,
-    adjusted_mutual_info_score,
-    adjusted_rand_score,
-)
-from sklearn.preprocessing import (
-    StandardScaler,
-    QuantileTransformer,
-)
-from pathlib import Path
 
 EXPERIMENT_DIR = Path(__file__).parent
 
@@ -42,32 +39,32 @@ logging.basicConfig(
 RESULTS_DIR = EXPERIMENT_DIR / f"results_{START_TIMESTAMP}"
 RESULTS_DIR.mkdir(exist_ok=True)
 
-# DATASETS = [
-#     ("GEMLER", load_gemler_data_normed(), load_gemler_normed_param_grid),
-#     ("METABRIC", load_metabric_data_normed(), load_metabric_normed_param_grid),
-# ]
 DATASETS = [
-    (
-        "GEMLER_StandardScaler",
-        load_gemler_data_normed(StandardScaler()),
-        load_gemler_normed_param_grid,
-    ),
-    (
-        "METABRIC_StandardScaler",
-        load_metabric_data_normed(StandardScaler()),
-        load_metabric_normed_param_grid,
-    ),
-    (
-        "GEMLER_QuantileScaler",
-        load_gemler_data_normed(QuantileTransformer()),
-        load_gemler_normed_param_grid,
-    ),
-    (
-        "METABRIC_QuantileScaler",
-        load_metabric_data_normed(QuantileTransformer()),
-        load_metabric_normed_param_grid,
-    ),
+    ("GEMLER", load_gemler_data_normed(), load_gemler_normed_param_grid),
+    ("METABRIC", load_metabric_data_normed(), load_metabric_normed_param_grid),
 ]
+# DATASETS = [
+#     (
+#         "GEMLER_StandardScaler",
+#         load_gemler_data_normed(StandardScaler()),
+#         load_gemler_normed_param_grid,
+#     ),
+#     (
+#         "METABRIC_StandardScaler",
+#         load_metabric_data_normed(StandardScaler()),
+#         load_metabric_normed_param_grid,
+#     ),
+#     (
+#         "GEMLER_QuantileScaler",
+#         load_gemler_data_normed(QuantileTransformer()),
+#         load_gemler_normed_param_grid,
+#     ),
+#     (
+#         "METABRIC_QuantileScaler",
+#         load_metabric_data_normed(QuantileTransformer()),
+#         load_metabric_normed_param_grid,
+#     ),
+# ]
 
 CV_SPLITS = 2
 CV_REPEATS = 5
@@ -89,7 +86,7 @@ SCORERS = {
 
 def get_grid_search_kwargs(param_grid: Union[list[dict], dict]) -> dict:
     return dict(
-        estimator=Pipeline([("cluster_algo", None)]),
+        estimator=Pipeline([("reduce_dim", "passthrough"), ("cluster_algo", None)]),
         param_grid=param_grid,
         cv=CV_SCHEME,
         scoring=SCORERS,
