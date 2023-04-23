@@ -16,6 +16,7 @@ from sklearn.cluster import (
 )
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
+from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import QuantileTransformer, StandardScaler
 from sklearn_extra.cluster import KMedoids
 from tqdm.auto import tqdm
@@ -112,15 +113,23 @@ def embedding_plot_per_best_config(
         fig = plt.figure(figsize=(n_rows * 10, n_cols * 5))
 
         for n, param_dict in enumerate(best_results_params):
+            reduce_dim = (
+                param_dict["reduce_dim"]
+                if "reduce_dim" in param_dict
+                else "passthrough"
+            )
             cluster_algo = param_dict["cluster_algo"]
             for key, value in param_dict.items():
-                if key == "cluster_algo":
+                if key in ["cluster_algo", "reduce_dim"]:
                     continue
                 setattr(cluster_algo, key[len("cluster_algo__") :], value)
+            pipeline = Pipeline(
+                [("reduce_dim", reduce_dim), ("cluster_algo", cluster_algo)]
+            )
 
-            labels = pd.Series(
-                cluster_algo.fit_predict(data_df), index=data_df.index
-            ).map(str)
+            labels = pd.Series(pipeline.fit_predict(data_df), index=data_df.index).map(
+                str
+            )
 
             ax = fig.add_subplot(n_rows, n_cols, n + 1)
             sns.scatterplot(
@@ -130,7 +139,7 @@ def embedding_plot_per_best_config(
                 hue=labels,
                 ax=ax,
             )
-            ax.set_title(str(cluster_algo))
+            ax.set_title(str(pipeline))
         if ground_truth is not None:
             ax = fig.add_subplot(n_rows, n_cols, n + 2)
             sns.scatterplot(
