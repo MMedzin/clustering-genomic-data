@@ -16,9 +16,11 @@ from sklearn.cluster import (
 )
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
+from sklearn.mixture import GaussianMixture
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import QuantileTransformer, StandardScaler
 from sklearn_extra.cluster import KMedoids
+from somlearn.som import SOM
 from tqdm.auto import tqdm
 from umap import UMAP
 from utils import SEED, load_gemler_data_normed, load_metabric_data_normed
@@ -116,7 +118,7 @@ def embedding_plot_per_best_config(
             reduce_dim = (
                 param_dict["reduce_dim"]
                 if "reduce_dim" in param_dict
-                else "passthrough"
+                else "passthroughg"
             )
             cluster_algo = param_dict["cluster_algo"]
             for key, value in param_dict.items():
