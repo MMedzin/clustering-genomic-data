@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Optional
 
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 import seaborn as sns
 from sklearn.cluster import (
@@ -36,11 +37,11 @@ DATASETS = {
 #     "METABRIC_QuantileScaler": load_metabric_data_normed(QuantileTransformer()),
 # }
 SCORES = [
-    ("silhouette", max),
-    ("calinski_harabasz", max),
-    ("davies_bouldin", min),
-    ("adjusted_rand_index", lambda x: max(x[x != 0], default=None)),
-    ("adjusted_mutual_info", lambda x: max(x[x > 0], default=None)),
+    ("silhouette", lambda x: max(x[~x.isna()], default=None)),
+    ("calinski_harabasz", lambda x: max(x[~x.isna()], default=None)),
+    ("davies_bouldin", lambda x: min(x[~x.isna()], default=None)),
+    ("adjusted_rand_index", lambda x: max(x[(x != 0) & (~x.isna())], default=None)),
+    ("adjusted_mutual_info", lambda x: max(x[(x > 0) & (~x.isna())], default=None)),
 ]
 
 
@@ -70,7 +71,7 @@ def boxplot_scores_per_best_config(results_df: pd.DataFrame, save_path: Path) ->
     for n, (score, transform_func) in enumerate(SCORES):
         max_ids = (
             results_df.groupby("algo_name")[f"mean_test_{score}"].transform(
-                transform_func
+                transform_func,
             )
             == results_df.loc[:, f"mean_test_{score}"]
         )
@@ -104,7 +105,7 @@ def embedding_plot_per_best_config(
     for score, transform_func in tqdm(SCORES):
         best_ids = (
             results_df.groupby("algo_name")[f"mean_test_{score}"].transform(
-                transform_func
+                transform_func,
             )
             == results_df.loc[:, f"mean_test_{score}"]
         )
