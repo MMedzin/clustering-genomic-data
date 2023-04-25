@@ -45,6 +45,10 @@ SCORES = [
 ]
 
 
+def path_list_parse(arg: str, delim: str = ",") -> list[Path]:
+    return [Path(a) for a in arg.split(delim)]
+
+
 def boxplot_mean_scores_per_algo(results_df: pd.DataFrame, save_path: Path) -> None:
     n_cols = 3
     n_rows = int(len(SCORES) // n_cols + 1 * (len(SCORES) % n_cols > 0))
@@ -55,6 +59,9 @@ def boxplot_mean_scores_per_algo(results_df: pd.DataFrame, save_path: Path) -> N
             data=results_df,
             x="algo_name",
             y=f"mean_test_{score}",
+            hue="results_tag"
+            if results_df.loc[:, "results_tag"].unique().shape[0] > 1
+            else None,
             ax=ax,
         )
         ax.set_title(" ".join([s.capitalize() for s in score.split("_")]))
@@ -70,15 +77,17 @@ def boxplot_scores_per_best_config(results_df: pd.DataFrame, save_path: Path) ->
     fig = plt.figure(figsize=(n_rows * 10, n_cols * 5))
     for n, (score, transform_func) in enumerate(SCORES):
         max_ids = (
-            results_df.groupby("algo_name")[f"mean_test_{score}"].transform(
+            results_df.groupby(["algo_name", "results_tag"])[
+                f"mean_test_{score}"
+            ].transform(
                 transform_func,
             )
             == results_df.loc[:, f"mean_test_{score}"]
         )
         max_results_df = (
             results_df.loc[max_ids]
-            .filter(regex=f"(split[0-9]+_test_{score}|algo_name)")
-            .melt("algo_name")
+            .filter(regex=f"(split[0-9]+_test_{score}|algo_name|results_tag)")
+            .melt(id_vars=["algo_name", "results_tag"])
         )
 
         ax = fig.add_subplot(n_rows, n_cols, n + 1)
@@ -86,6 +95,9 @@ def boxplot_scores_per_best_config(results_df: pd.DataFrame, save_path: Path) ->
             data=max_results_df,
             x="algo_name",
             y=f"value",
+            hue="results_tag"
+            if max_results_df.loc[:, "results_tag"].unique().shape[0] > 1
+            else None,
             ax=ax,
         )
         ax.set_title(" ".join([s.capitalize() for s in score.split("_")]))
@@ -158,82 +170,100 @@ def embedding_plot_per_best_config(
         fig.savefig(save_dir / f"Embedding_best_hyperparameters_{score}.png")
 
 
-def main(results_dir: Path, datasets: list[str]) -> None:
+def joined_results_dir(results_dirs: list[Path]):
+    return results_dirs[0].parent / "_vs_".join([r.name for r in results_dirs])
+
+
+def main(
+    results_dirs: list[Path], datasets: list[str], skip_embedding: bool = False
+) -> None:
     for dataset in datasets:
-        results_df = pd.read_csv(
-            results_dir / f"{dataset}_grid_search.csv", index_col=0
-        ).reset_index()
+        results_dfs = []
+        for i, results_dir in enumerate(results_dirs):
+            results_dfs.append(
+                pd.read_csv(
+                    results_dir / f"{dataset}_grid_search.csv", index_col=0
+                ).reset_index()
+            )
+            results_dfs[i]["results_tag"] = results_dir.name
+        results_df = pd.concat(results_dfs)
+
+        output_dir = joined_results_dir(results_dirs)
+        output_dir.mkdir(exist_ok=True)
 
         boxplot_mean_scores_per_algo(
-            results_df, results_dir / f"{dataset}_mean_score_per_algo.png"
+            results_df,
+            output_dir / f"{dataset}_mean_score_per_algo.png",
         )
 
         boxplot_scores_per_best_config(
             results_df,
-            results_dir / f"{dataset}_best_config_scores.png",
+            output_dir / f"{dataset}_best_config_scores.png",
         )
 
-        data_df, ground_truth = DATASETS[dataset]()
+        if not skip_embedding and len(results_dirs) == 1:
+            data_df, ground_truth = DATASETS[dataset]()
 
-        embedding = pd.DataFrame(
-            TSNE(
-                n_components=2, random_state=SEED, perplexity=30, metric="manhattan"
-            ).fit_transform(data_df),
-            index=data_df.index,
-            columns=["x", "y"],
-        )
+            embedding = pd.DataFrame(
+                TSNE(
+                    n_components=2, random_state=SEED, perplexity=30, metric="manhattan"
+                ).fit_transform(data_df),
+                index=data_df.index,
+                columns=["x", "y"],
+            )
 
-        tsne_dir = results_dir / f"{dataset}_tsne"
-        tsne_dir.mkdir(exist_ok=True)
+            tsne_dir = results_dir / f"{dataset}_tsne"
+            tsne_dir.mkdir(exist_ok=True)
 
-        embedding_plot_per_best_config(
-            results_df,
-            data_df,
-            embedding,
-            ground_truth,
-            tsne_dir,
-        )
+            embedding_plot_per_best_config(
+                results_df,
+                data_df,
+                embedding,
+                ground_truth,
+                tsne_dir,
+            )
 
-        embedding = pd.DataFrame(
-            PCA(n_components=2, random_state=SEED).fit_transform(data_df),
-            index=data_df.index,
-            columns=["x", "y"],
-        )
+            embedding = pd.DataFrame(
+                PCA(n_components=2, random_state=SEED).fit_transform(data_df),
+                index=data_df.index,
+                columns=["x", "y"],
+            )
 
-        pca_dir = results_dir / f"{dataset}_pca"
-        pca_dir.mkdir(exist_ok=True)
+            pca_dir = results_dir / f"{dataset}_pca"
+            pca_dir.mkdir(exist_ok=True)
 
-        embedding_plot_per_best_config(
-            results_df,
-            data_df,
-            embedding,
-            ground_truth,
-            pca_dir,
-        )
+            embedding_plot_per_best_config(
+                results_df,
+                data_df,
+                embedding,
+                ground_truth,
+                pca_dir,
+            )
 
-        embedding = pd.DataFrame(
-            UMAP(n_components=2, random_state=SEED).fit_transform(data_df),
-            index=data_df.index,
-            columns=["x", "y"],
-        )
+            embedding = pd.DataFrame(
+                UMAP(n_components=2, random_state=SEED).fit_transform(data_df),
+                index=data_df.index,
+                columns=["x", "y"],
+            )
 
-        umap_dir = results_dir / f"{dataset}_umap"
-        umap_dir.mkdir(exist_ok=True)
+            umap_dir = results_dir / f"{dataset}_umap"
+            umap_dir.mkdir(exist_ok=True)
 
-        embedding_plot_per_best_config(
-            results_df,
-            data_df,
-            embedding,
-            ground_truth,
-            umap_dir,
-        )
+            embedding_plot_per_best_config(
+                results_df,
+                data_df,
+                embedding,
+                ground_truth,
+                umap_dir,
+            )
 
 
 if __name__ == "__main__":
     argparser = ArgumentParser()
-    argparser.add_argument("results_dir", type=Path)
+    argparser.add_argument("results_dirs", type=path_list_parse)
     argparser.add_argument(
         "--datasets", type=lambda x: x.split(","), default=list(DATASETS.keys())
     )
+    argparser.add_argument("--skip_embedding", default=False, action="store_true")
     kwargs = dict(argparser.parse_args()._get_kwargs())
     main(**kwargs)
