@@ -27,8 +27,8 @@ from umap import UMAP
 from utils import SEED, load_gemler_data_normed, load_metabric_data_normed
 
 DATASETS = {
-    "GEMLER": load_gemler_data_normed(),
-    "METABRIC": load_metabric_data_normed(),
+    "GEMLER": load_gemler_data_normed(StandardScaler()),
+    "METABRIC": load_metabric_data_normed(StandardScaler()),
 }
 # DATASETS = {
 #     "GEMLER_StandardScaler": load_gemler_data_normed(StandardScaler()),
