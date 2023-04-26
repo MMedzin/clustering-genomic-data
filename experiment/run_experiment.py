@@ -16,6 +16,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import LabelEncoder, QuantileTransformer, StandardScaler
 from utils import (
     SEED,
+    clusters_count_scorer,
     load_gemler_data_normed,
     load_gemler_normed_param_grid,
     load_metabric_data_normed,
@@ -40,8 +41,16 @@ RESULTS_DIR = EXPERIMENT_DIR / f"results_{START_TIMESTAMP}"
 RESULTS_DIR.mkdir(exist_ok=True)
 
 DATASETS = [
-    ("GEMLER", load_gemler_data_normed(), load_gemler_normed_param_grid),
-    ("METABRIC", load_metabric_data_normed(), load_metabric_normed_param_grid),
+    (
+        "GEMLER",
+        load_gemler_data_normed(StandardScaler()),
+        load_gemler_normed_param_grid,
+    ),
+    (
+        "METABRIC",
+        load_metabric_data_normed(StandardScaler()),
+        load_metabric_normed_param_grid,
+    ),
 ]
 # DATASETS = [
 #     (
@@ -81,6 +90,7 @@ SCORERS = {
     "adjusted_mutual_info": make_clustering_scorer_supervised(
         adjusted_mutual_info_score
     ),
+    "clusters_count": clusters_count_scorer,
 }
 
 
@@ -117,7 +127,7 @@ def main() -> None:
                     results_df = pd.DataFrame(grid_search.cv_results_)
                     results_df["algo_name"] = algo_name
                     results_df.loc[
-                        :, ~results_df.columns.str.startswith("param_cluster_algo")
+                        :, ~results_df.columns.str.startswith("param_")
                     ].to_csv(
                         RESULTS_DIR / f"{name}_grid_search.csv",
                         mode="a",
