@@ -43,7 +43,7 @@ RESULTS_DIR.mkdir(exist_ok=True)
 DATASETS = [
     (
         "GEMLER",
-        load_gemler_data_normed()),
+        load_gemler_data_normed(),
         load_gemler_normed_param_grid,
     ),
     (
