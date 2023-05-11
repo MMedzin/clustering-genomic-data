@@ -22,7 +22,9 @@ from sklearn.mixture import GaussianMixture
 from sklearn.neighbors import LocalOutlierFactor
 from sklearn.preprocessing import FunctionTransformer, MinMaxScaler
 from sklearn_extra.cluster import KMedoids
-from somlearn.som import SOM
+from sklearn_som.som import SOM
+
+# from somlearn.som import SOM
 
 FILE_DIR = Path(__file__).parent
 DATASETS_PATH = FILE_DIR / "../datasets"
@@ -199,15 +201,26 @@ def load_gemler_normed_param_grid() -> list[dict]:
         #     "cluster_algo__n_components": K_VALUES,
         #     "cluster_algo__covariance_type": COVARIANCE_TYPE_VALUES,
         # },
-        "SOM": [
+        # "SOM": [ # som_learn version
+        #     {
+        #         # "reduce_dim": ["passthrough", PCA(n_components=PCA_COMPONENTS)],
+        #         "reduce_dim": [PCA(n_components=PCA_COMPONENTS)],
+        #         "cluster_algo": [SOM(random_state=SEED)],
+        #         "cluster_algo__n_columns": [k1],
+        #         "cluster_algo__n_rows": [k2],
+        #         "cluster_algo__initialcodebook": SOM_INITIALCODEBOOK_VALUES,
+        #         "cluster_algo__neighborhood": SOM_NEIGHBORHOOD_VALUES,
+        #     }
+        #     for k1, k2 in product([1] + list(K_VALUES), list(K_VALUES))
+        #     if k1 * k2 <= max(K_VALUES)
+        # ],
+        "SOM": [  # sklearn_som version
             {
                 # "reduce_dim": ["passthrough", PCA(n_components=PCA_COMPONENTS)],
                 "reduce_dim": [PCA(n_components=PCA_COMPONENTS)],
-                "cluster_algo": [SOM(random_state=SEED)],
-                "cluster_algo__n_columns": [k1],
-                "cluster_algo__n_rows": [k2],
-                "cluster_algo__initialcodebook": SOM_INITIALCODEBOOK_VALUES,
-                "cluster_algo__neighborhood": SOM_NEIGHBORHOOD_VALUES,
+                "cluster_algo": [SOM(dim=PCA_COMPONENTS, random_state=SEED)],
+                "cluster_algo__m": [k1],
+                "cluster_algo__n": [k2],
             }
             for k1, k2 in product([1] + list(K_VALUES), list(K_VALUES))
             if k1 * k2 <= max(K_VALUES)
