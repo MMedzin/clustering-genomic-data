@@ -103,6 +103,7 @@ def get_grid_search_kwargs(param_grid: Union[list[dict], dict]) -> dict:
         n_jobs=-1,
         verbose=2,
         refit=list(SCORERS.keys())[0],
+        error_score="raise",
     )
 
 
