@@ -21,7 +21,6 @@ from sklearn.mixture import GaussianMixture
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import QuantileTransformer, StandardScaler
 from sklearn_extra.cluster import KMedoids
-# from somlearn.som import SOM
 from sklearn_som.som import SOM
 from tqdm.auto import tqdm
 from umap import UMAP

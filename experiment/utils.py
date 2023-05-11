@@ -132,8 +132,9 @@ def load_gemler_normed_param_grid() -> list[dict]:
     ]
     MIN_SAMPLES_VALUES = [3, 11, 20, 28, 37]
     COVARIANCE_TYPE_VALUES = ["full", "tied", "diag", "spherical"]
-    SOM_INITIALCODEBOOK_VALUES = [None, "pca"]
-    SOM_NEIGHBORHOOD_VALUES = ["gaussian", "bubble"]
+    # SOM_INITIALCODEBOOK_VALUES = [None, "pca"]
+    # SOM_NEIGHBORHOOD_VALUES = ["gaussian", "bubble"]
+    SOM_EPOCHS = [10, 50, 100, 200, 300]
     AFFINITY_PROP_DUMPING_VALUES = np.arange(0.5, 1, 0.1)
     AFFINITY_PROP_PREFERENCE_VALUES = [
         -324.33104770458385,
@@ -148,59 +149,66 @@ def load_gemler_normed_param_grid() -> list[dict]:
         0.0,
     ]
     PCA_COMPONENTS = 199
+    FEATURES_COUNT = 7888
 
     return {
-        # "KMeans": {
-        #     # "reduce_dim": ["passthrough", PCA(n_components=PCA_COMPONENTS)],
-        #     "reduce_dim": [PCA(n_components=PCA_COMPONENTS)],
-        #     "cluster_algo": [KMeans(n_init="auto", random_state=SEED)],
-        #     "cluster_algo__n_clusters": K_VALUES,
-        #     "cluster_algo__init": K_MEANS_INIT,
-        # },
-        # "KMedoids": {
-        #     # "reduce_dim": ["passthrough", PCA(n_components=PCA_COMPONENTS)],
-        #     "reduce_dim": [PCA(n_components=PCA_COMPONENTS)],
-        #     "cluster_algo": [KMedoids(random_state=SEED)],
-        #     "cluster_algo__n_clusters": K_VALUES,
-        #     "cluster_algo__init": K_MEDOIDS_INIT,
-        # },
-        # "AgglomerativeClustering": {
-        #     # "reduce_dim": ["passthrough", PCA(n_components=PCA_COMPONENTS)],
-        #     "reduce_dim": [PCA(n_components=PCA_COMPONENTS)],
-        #     "cluster_algo": [AgglomerativeClustering()],
-        #     "cluster_algo__n_clusters": K_VALUES,
-        #     "cluster_algo__linkage": LINKAGE_VALUES,
-        # },
-        # "Birch": {
-        #     # "reduce_dim": ["passthrough", PCA(n_components=PCA_COMPONENTS)],
-        #     "reduce_dim": [PCA(n_components=PCA_COMPONENTS)],
-        #     "cluster_algo": [Birch()],
-        #     "cluster_algo__threshold": BIRCH_THRESHOLD_VALUES,
-        #     "cluster_algo__branching_factor": BIRCH_BRANCHING_FACTOR_VALUES,
-        #     "cluster_algo__n_clusters": list(K_VALUES) + [None],
-        # },
-        # "DBSCAN": [
-        #     {
-        #         # "reduce_dim": ["passthrough", PCA(n_components=PCA_COMPONENTS)],
-        #         "reduce_dim": [PCA(n_components=PCA_COMPONENTS)],
-        #         "cluster_algo": [DBSCAN()],
-        #         "cluster_algo__eps": [eps],
-        #         "cluster_algo__min_samples": [min_samples],
-        #     }
-        #     for eps, min_samples in zip(EPS_VALUES, MIN_SAMPLES_VALUES)
-        # ],
-        # "OPTICS": {
-        #     # "reduce_dim": ["passthrough", PCA(n_components=PCA_COMPONENTS)],
-        #     "reduce_dim": [PCA(n_components=PCA_COMPONENTS)],
-        #     "cluster_algo": [OPTICS(cluster_method="dbscan")],
-        #     "cluster_algo__min_samples": MIN_SAMPLES_VALUES,
-        # },
-        # "GaussianMixture": {
-        #     "reduce_dim": [PCA(n_components=PCA_COMPONENTS)],
-        #     "cluster_algo": [GaussianMixture(random_state=SEED)],
-        #     "cluster_algo__n_components": K_VALUES,
-        #     "cluster_algo__covariance_type": COVARIANCE_TYPE_VALUES,
-        # },
+        "KMeans": {
+            # "reduce_dim": ["passthrough", PCA(n_components=PCA_COMPONENTS)],
+            # "reduce_dim": [PCA(n_components=PCA_COMPONENTS)],
+            "reduce_dim": ["passthrough"],
+            "cluster_algo": [KMeans(n_init="auto", random_state=SEED)],
+            "cluster_algo__n_clusters": K_VALUES,
+            "cluster_algo__init": K_MEANS_INIT,
+        },
+        "KMedoids": {
+            # "reduce_dim": ["passthrough", PCA(n_components=PCA_COMPONENTS)],
+            # "reduce_dim": [PCA(n_components=PCA_COMPONENTS)],
+            "reduce_dim": ["passthrough"],
+            "cluster_algo": [KMedoids(random_state=SEED)],
+            "cluster_algo__n_clusters": K_VALUES,
+            "cluster_algo__init": K_MEDOIDS_INIT,
+        },
+        "AgglomerativeClustering": {
+            # "reduce_dim": ["passthrough", PCA(n_components=PCA_COMPONENTS)],
+            # "reduce_dim": [PCA(n_components=PCA_COMPONENTS)],
+            "reduce_dim": ["passthrough"],
+            "cluster_algo": [AgglomerativeClustering()],
+            "cluster_algo__n_clusters": K_VALUES,
+            "cluster_algo__linkage": LINKAGE_VALUES,
+        },
+        "Birch": {
+            # "reduce_dim": ["passthrough", PCA(n_components=PCA_COMPONENTS)],
+            # "reduce_dim": [PCA(n_components=PCA_COMPONENTS)],
+            "reduce_dim": ["passthrough"],
+            "cluster_algo": [Birch()],
+            "cluster_algo__threshold": BIRCH_THRESHOLD_VALUES,
+            "cluster_algo__branching_factor": BIRCH_BRANCHING_FACTOR_VALUES,
+            "cluster_algo__n_clusters": list(K_VALUES) + [None],
+        },
+        "DBSCAN": [
+            {
+                # "reduce_dim": ["passthrough", PCA(n_components=PCA_COMPONENTS)],
+                # "reduce_dim": [PCA(n_components=PCA_COMPONENTS)],
+                "reduce_dim": ["passthrough"],
+                "cluster_algo": [DBSCAN()],
+                "cluster_algo__eps": [eps],
+                "cluster_algo__min_samples": [min_samples],
+            }
+            for eps, min_samples in zip(EPS_VALUES, MIN_SAMPLES_VALUES)
+        ],
+        "OPTICS": {
+            # "reduce_dim": ["passthrough", PCA(n_components=PCA_COMPONENTS)],
+            # "reduce_dim": [PCA(n_components=PCA_COMPONENTS)],
+            "reduce_dim": ["passthrough"],
+            "cluster_algo": [OPTICS(cluster_method="dbscan")],
+            "cluster_algo__min_samples": MIN_SAMPLES_VALUES,
+        },
+        "GaussianMixture": {
+            "reduce_dim": [PCA(n_components=PCA_COMPONENTS)],
+            "cluster_algo": [GaussianMixture(random_state=SEED)],
+            "cluster_algo__n_components": K_VALUES,
+            "cluster_algo__covariance_type": COVARIANCE_TYPE_VALUES,
+        },
         # "SOM": [ # som_learn version
         #     {
         #         # "reduce_dim": ["passthrough", PCA(n_components=PCA_COMPONENTS)],
@@ -216,41 +224,45 @@ def load_gemler_normed_param_grid() -> list[dict]:
         # ],
         "SOM": [  # sklearn_som version
             {
-                # "reduce_dim": ["passthrough", PCA(n_components=PCA_COMPONENTS)],
-                "reduce_dim": [PCA(n_components=PCA_COMPONENTS)],
-                "cluster_algo": [SOM(dim=PCA_COMPONENTS, random_state=SEED)],
+                # "reduce_dim": [PCA(n_components=PCA_COMPONENTS)],
+                # "cluster_algo": [SOM(dim=PCA_COMPONENTS, random_state=SEED)],
+                "reduce_dim": ["passthrough"],
+                "cluster_algo": [SOM(dim=FEATURES_COUNT, random_state=SEED)],
+                "cluster_algo__epochs": SOM_EPOCHS,
                 "cluster_algo__m": [k1],
                 "cluster_algo__n": [k2],
             }
             for k1, k2 in product([1] + list(K_VALUES), list(K_VALUES))
             if k1 * k2 <= max(K_VALUES)
         ],
-        # "AffinityPropagation": {
-        #     # "reduce_dim": ["passthrough", PCA(n_components=PCA_COMPONENTS)],
-        #     "reduce_dim": [PCA(n_components=PCA_COMPONENTS)],
-        #     "cluster_algo": [AffinityPropagation(random_state=SEED)],
-        #     "cluster_algo__damping": AFFINITY_PROP_DUMPING_VALUES,
-        #     "cluster_algo__preference": AFFINITY_PROP_PREFERENCE_VALUES,
-        # },
-        # "SpectralClustering": [
-        #     {
-        #         # "reduce_dim": ["passthrough", PCA(n_components=PCA_COMPONENTS)],
-        #         "reduce_dim": [PCA(n_components=PCA_COMPONENTS)],
-        #         "cluster_algo": [SpectralClustering(random_state=SEED)],
-        #         "cluster_algo__n_clusters": K_VALUES,
-        #         "cluster_algo__affinity": ["rbf"],
-        #         "cluster_algo__assign_labels": ["kmeans", "discretize", "cluster_qr"],
-        #     },
-        #     {
-        #         # "reduce_dim": ["passthrough", PCA(n_components=PCA_COMPONENTS)],
-        #         "reduce_dim": [PCA(n_components=PCA_COMPONENTS)],
-        #         "cluster_algo": [SpectralClustering(random_state=SEED)],
-        #         "cluster_algo__n_clusters": K_VALUES,
-        #         "cluster_algo__affinity": ["nearest_neighbors"],
-        #         "cluster_algo__n_neighbors": MIN_SAMPLES_VALUES,
-        #         "cluster_algo__assign_labels": ["kmeans", "discretize", "cluster_qr"],
-        #     },
-        # ],
+        "AffinityPropagation": {
+            # "reduce_dim": ["passthrough", PCA(n_components=PCA_COMPONENTS)],
+            "reduce_dim": [PCA(n_components=PCA_COMPONENTS)],
+            "cluster_algo": [AffinityPropagation(random_state=SEED)],
+            "cluster_algo__damping": AFFINITY_PROP_DUMPING_VALUES,
+            "cluster_algo__preference": AFFINITY_PROP_PREFERENCE_VALUES,
+        },
+        "SpectralClustering": [
+            {
+                # "reduce_dim": ["passthrough", PCA(n_components=PCA_COMPONENTS)],
+                # "reduce_dim": [PCA(n_components=PCA_COMPONENTS)],
+                "reduce_dim": ["passthrough"],
+                "cluster_algo": [SpectralClustering(random_state=SEED)],
+                "cluster_algo__n_clusters": K_VALUES,
+                "cluster_algo__affinity": ["rbf"],
+                "cluster_algo__assign_labels": ["kmeans", "discretize", "cluster_qr"],
+            },
+            {
+                # "reduce_dim": ["passthrough", PCA(n_components=PCA_COMPONENTS)],
+                # "reduce_dim": [PCA(n_components=PCA_COMPONENTS)],
+                "reduce_dim": ["passthrough"],
+                "cluster_algo": [SpectralClustering(random_state=SEED)],
+                "cluster_algo__n_clusters": K_VALUES,
+                "cluster_algo__affinity": ["nearest_neighbors"],
+                "cluster_algo__n_neighbors": MIN_SAMPLES_VALUES,
+                "cluster_algo__assign_labels": ["kmeans", "discretize", "cluster_qr"],
+            },
+        ],
     }
 
 
@@ -302,8 +314,9 @@ def load_metabric_normed_param_grid() -> list[dict]:
     ]
     MIN_SAMPLES_VALUES = [5, 16, 28, 40, 52]
     COVARIANCE_TYPE_VALUES = ["full", "tied", "diag", "spherical"]
-    SOM_INITIALCODEBOOK_VALUES = [None, "pca"]
-    SOM_NEIGHBORHOOD_VALUES = ["gaussian", "bubble"]
+    # SOM_INITIALCODEBOOK_VALUES = [None, "pca"]
+    # SOM_NEIGHBORHOOD_VALUES = ["gaussian", "bubble"]
+    SOM_EPOCHS = [10, 50, 100, 200, 300]
     AFFINITY_PROP_DUMPING_VALUES = np.arange(0.5, 1, 0.1)
     [
         -1133.0037800747316,
@@ -330,28 +343,33 @@ def load_metabric_normed_param_grid() -> list[dict]:
         0.0,
     ]
     PCA_COMPONENTS = 242
+    FEATURES_COUNT = 20000
 
     return {
         "KMeans": {
-            "reduce_dim": ["passthrough", PCA(n_components=PCA_COMPONENTS)],
+            # "reduce_dim": ["passthrough", PCA(n_components=PCA_COMPONENTS)],
+            "reduce_dim": ["passthrough"],
             "cluster_algo": [KMeans(n_init="auto", random_state=SEED)],
             "cluster_algo__n_clusters": K_VALUES,
             "cluster_algo__init": K_MEANS_INIT,
         },
         "KMedoids": {
-            "reduce_dim": ["passthrough", PCA(n_components=PCA_COMPONENTS)],
+            # "reduce_dim": ["passthrough", PCA(n_components=PCA_COMPONENTS)],
+            "reduce_dim": ["passthrough"],
             "cluster_algo": [KMedoids(random_state=SEED)],
             "cluster_algo__n_clusters": K_VALUES,
             "cluster_algo__init": K_MEDOIDS_INIT,
         },
         "AgglomerativeClustering": {
-            "reduce_dim": ["passthrough", PCA(n_components=PCA_COMPONENTS)],
+            # "reduce_dim": ["passthrough", PCA(n_components=PCA_COMPONENTS)],
+            "reduce_dim": ["passthrough"],
             "cluster_algo": [AgglomerativeClustering()],
             "cluster_algo__n_clusters": K_VALUES,
             "cluster_algo__linkage": LINKAGE_VALUES,
         },
         "Birch": {
-            "reduce_dim": ["passthrough", PCA(n_components=PCA_COMPONENTS)],
+            # "reduce_dim": ["passthrough", PCA(n_components=PCA_COMPONENTS)],
+            "reduce_dim": ["passthrough"],
             "cluster_algo": [Birch()],
             "cluster_algo__threshold": BIRCH_THRESHOLD_VALUES,
             "cluster_algo__branching_factor": BIRCH_BRANCHING_FACTOR_VALUES,
@@ -359,7 +377,8 @@ def load_metabric_normed_param_grid() -> list[dict]:
         },
         "DBSCAN": [
             {
-                "reduce_dim": ["passthrough", PCA(n_components=PCA_COMPONENTS)],
+                # "reduce_dim": ["passthrough", PCA(n_components=PCA_COMPONENTS)],
+                "reduce_dim": ["passthrough"],
                 "cluster_algo": [DBSCAN()],
                 "cluster_algo__eps": [eps],
                 "cluster_algo__min_samples": [min_samples],
@@ -367,45 +386,62 @@ def load_metabric_normed_param_grid() -> list[dict]:
             for eps, min_samples in zip(EPS_VALUES, MIN_SAMPLES_VALUES)
         ],
         "OPTICS": {
-            "reduce_dim": ["passthrough", PCA(n_components=PCA_COMPONENTS)],
+            # "reduce_dim": ["passthrough", PCA(n_components=PCA_COMPONENTS)],
+            "reduce_dim": ["passthrough"],
             "cluster_algo": [OPTICS(cluster_method="dbscan")],
             "cluster_algo__min_samples": MIN_SAMPLES_VALUES,
         },
         "GaussianMixture": {
-            "reduce_dim": ["passthrough", PCA(n_components=PCA_COMPONENTS)],
+            "reduce_dim": [PCA(n_components=PCA_COMPONENTS)],
             "reduce_dim": [PCA(n_components=PCA_COMPONENTS)],
             "cluster_algo": [GaussianMixture(random_state=SEED)],
             "cluster_algo__n_components": K_VALUES,
             "cluster_algo__covariance_type": COVARIANCE_TYPE_VALUES,
         },
-        "SOM": [
+        # "SOM": [ # som_learn version
+        #     {
+        #         "reduce_dim": ["passthrough", PCA(n_components=PCA_COMPONENTS)],
+        #         "cluster_algo": [SOM(random_state=SEED)],
+        #         "cluster_algo__n_columns": [k1],
+        #         "cluster_algo__n_rows": [k2],
+        #         "cluster_algo__initialcodebook": SOM_INITIALCODEBOOK_VALUES,
+        #         "cluster_algo__neighborhood": SOM_NEIGHBORHOOD_VALUES,
+        #     }
+        #     for k1, k2 in product([1] + list(K_VALUES), list(K_VALUES))
+        #     if k1 * k2 <= max(K_VALUES)
+        # ],
+        "SOM": [  # sklearn_som version
             {
-                "reduce_dim": ["passthrough", PCA(n_components=PCA_COMPONENTS)],
-                "cluster_algo": [SOM(random_state=SEED)],
-                "cluster_algo__n_columns": [k1],
-                "cluster_algo__n_rows": [k2],
-                "cluster_algo__initialcodebook": SOM_INITIALCODEBOOK_VALUES,
-                "cluster_algo__neighborhood": SOM_NEIGHBORHOOD_VALUES,
+                # "reduce_dim": [PCA(n_components=PCA_COMPONENTS)],
+                # "cluster_algo": [SOM(dim=PCA_COMPONENTS, random_state=SEED)],
+                "reduce_dim": ["passthrough"],
+                "cluster_algo": [SOM(dim=FEATURES_COUNT, random_state=SEED)],
+                "cluster_algo__epochs": SOM_EPOCHS,
+                "cluster_algo__m": [k1],
+                "cluster_algo__n": [k2],
             }
             for k1, k2 in product([1] + list(K_VALUES), list(K_VALUES))
             if k1 * k2 <= max(K_VALUES)
         ],
         "AffinityPropagation": {
-            "reduce_dim": ["passthrough", PCA(n_components=PCA_COMPONENTS)],
+            # "reduce_dim": ["passthrough", PCA(n_components=PCA_COMPONENTS)],
+            "reduce_dim": ["passthrough"],
             "cluster_algo": [AffinityPropagation(random_state=SEED)],
             "cluster_algo__damping": AFFINITY_PROP_DUMPING_VALUES,
             "cluster_algo__preference": AFFINITY_PROP_PREFERENCE_VALUES,
         },
         "SpectralClustering": [
             {
-                "reduce_dim": ["passthrough", PCA(n_components=PCA_COMPONENTS)],
+                # "reduce_dim": ["passthrough", PCA(n_components=PCA_COMPONENTS)],
+                "reduce_dim": ["passthrough"],
                 "cluster_algo": [SpectralClustering(random_state=SEED)],
                 "cluster_algo__n_clusters": K_VALUES,
                 "cluster_algo__affinity": ["rbf"],
                 "cluster_algo__assign_labels": ["kmeans", "discretize", "cluster_qr"],
             },
             {
-                "reduce_dim": ["passthrough", PCA(n_components=PCA_COMPONENTS)],
+                # "reduce_dim": ["passthrough", PCA(n_components=PCA_COMPONENTS)],
+                "reduce_dim": ["passthrough"],
                 "cluster_algo": [SpectralClustering(random_state=SEED)],
                 "cluster_algo__n_clusters": K_VALUES,
                 "cluster_algo__affinity": ["nearest_neighbors"],
