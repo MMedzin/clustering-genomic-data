@@ -209,9 +209,8 @@ def load_gemler_normed_param_grid() -> list[dict]:
                 "cluster_algo__initialcodebook": SOM_INITIALCODEBOOK_VALUES,
                 "cluster_algo__neighborhood": SOM_NEIGHBORHOOD_VALUES,
             }
-            for k1, k2 in [(2, 1)]
-            # for k1, k2 in product([1] + list(K_VALUES), list(K_VALUES))
-            # if k1 * k2 <= max(K_VALUES)
+            for k1, k2 in product([1] + list(K_VALUES), list(K_VALUES))
+            if k1 * k2 <= max(K_VALUES)
         ],
         # "AffinityPropagation": {
         #     # "reduce_dim": ["passthrough", PCA(n_components=PCA_COMPONENTS)],
