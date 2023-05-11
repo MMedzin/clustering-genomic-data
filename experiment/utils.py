@@ -226,8 +226,9 @@ def load_gemler_normed_param_grid() -> list[dict]:
             {
                 # "cluster_algo": [SOM(dim=PCA_COMPONENTS, random_state=SEED)],
                 "reduce_dim": [PCA(n_components=PCA_COMPONENTS)],
+                "cluster_algo": [SOM(dim=PCA_COMPONENTS, random_state=SEED)],
                 # "reduce_dim": ["passthrough"],
-                "cluster_algo": [SOM(dim=FEATURES_COUNT, random_state=SEED)],
+                # "cluster_algo": [SOM(dim=FEATURES_COUNT, random_state=SEED)],
                 "cluster_algo__epochs": SOM_EPOCHS,
                 "cluster_algo__m": [k1],
                 "cluster_algo__n": [k2],
@@ -419,8 +420,9 @@ def load_metabric_normed_param_grid() -> list[dict]:
             {
                 # "cluster_algo": [SOM(dim=PCA_COMPONENTS, random_state=SEED)],
                 "reduce_dim": [PCA(n_components=PCA_COMPONENTS)],
+                "cluster_algo": [SOM(dim=PCA_COMPONENTS, random_state=SEED)],
                 # "reduce_dim": ["passthrough"],
-                "cluster_algo": [SOM(dim=FEATURES_COUNT, random_state=SEED)],
+                # "cluster_algo": [SOM(dim=FEATURES_COUNT, random_state=SEED)],
                 "cluster_algo__epochs": SOM_EPOCHS,
                 "cluster_algo__m": [k1],
                 "cluster_algo__n": [k2],
