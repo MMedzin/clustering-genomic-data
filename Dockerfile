@@ -3,8 +3,6 @@ RUN mkdir datasets experiment
 ADD datasets/ datasets/
 ADD experiment experiment/
 WORKDIR /experiment
-RUN apt-get update && apt-get install gcc libc-dev libffi-dev
 RUN pip install -r requirements.txt
-RUN pip install -r requirements-som.txt
 CMD ["experiment/run_experiment.py"]
 ENTRYPOINT [ "python" ]
