@@ -124,7 +124,9 @@ def main() -> None:
             for i, (algo_name, algo_grid) in enumerate(param_grid_loader().items()):
                 try:
                     grid_search = GridSearchCV(**get_grid_search_kwargs(algo_grid))
-                    grid_search.fit(data, ground_truth_encoded)
+                    grid_search.fit(
+                        data.values, ground_truth_encoded.loc[data.index].values
+                    )
                     results_df = pd.DataFrame(grid_search.cv_results_)
                     results_df["algo_name"] = algo_name
                     results_df.loc[
