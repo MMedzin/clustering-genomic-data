@@ -46,11 +46,11 @@ DATASETS = [
         load_gemler_data_normed(),
         load_gemler_normed_param_grid,
     ),
-    (
-        "METABRIC",
-        load_metabric_data_normed(),
-        load_metabric_normed_param_grid,
-    ),
+    # (
+    #     "METABRIC",
+    #     load_metabric_data_normed(),
+    #     load_metabric_normed_param_grid,
+    # ),
 ]
 # DATASETS = [
 #     (
