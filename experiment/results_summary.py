@@ -23,12 +23,12 @@ from sklearn.preprocessing import QuantileTransformer, StandardScaler
 from sklearn_extra.cluster import KMedoids
 from sklearn_som.som import SOM
 from tqdm.auto import tqdm
-from umap import UMAP
+from umap.umap_ import UMAP
 from utils import SEED, load_gemler_data_normed, load_metabric_data_normed
 
 DATASETS = {
-    "GEMLER": load_gemler_data_normed(),
-    "METABRIC": load_metabric_data_normed(),
+    "GEMLER": load_gemler_data_normed(StandardScaler()),
+    "METABRIC": load_metabric_data_normed(StandardScaler()),
 }
 # DATASETS = {
 #     "GEMLER_StandardScaler": load_gemler_data_normed(StandardScaler()),
@@ -107,14 +107,13 @@ def boxplot_scores_per_best_config(results_df: pd.DataFrame, save_path: Path) ->
     fig.savefig(save_path)
 
 
-def embedding_plot_per_best_config(
+def get_best_labels_per_score_per_algo(
     results_df: pd.DataFrame,
     data_df: pd.DataFrame,
-    embedding: pd.DataFrame,
-    ground_truth: Optional[pd.Series],
-    save_dir: Path,
-) -> None:
+) -> dict[str, dict[str, pd.Series]]:
+    labels_per_score_per_algo = {}
     for score, transform_func in tqdm(SCORES):
+        labels_per_score_per_algo[score] = {}
         best_ids = (
             results_df.groupby("algo_name")[f"mean_test_{score}"].transform(
                 transform_func,
@@ -122,16 +121,12 @@ def embedding_plot_per_best_config(
             == results_df.loc[:, f"mean_test_{score}"]
         )
         best_results_params = results_df.loc[best_ids, "params"].map(lambda x: eval(x))
-        n_cols = 3
-        n_plots = len(best_results_params) + 1 * (ground_truth is not None)
-        n_rows = int(n_plots // n_cols + 1 * (n_plots % n_cols > 0))
-        fig = plt.figure(figsize=(n_rows * 10, n_cols * 5))
 
-        for n, param_dict in enumerate(best_results_params):
+        for param_dict in best_results_params:
             reduce_dim = (
                 param_dict["reduce_dim"]
                 if "reduce_dim" in param_dict
-                else "passthroughg"
+                else "passthrough"
             )
             cluster_algo = param_dict["cluster_algo"]
             for key, value in param_dict.items():
@@ -142,10 +137,25 @@ def embedding_plot_per_best_config(
                 [("reduce_dim", reduce_dim), ("cluster_algo", cluster_algo)]
             )
 
-            labels = pd.Series(pipeline.fit_predict(data_df), index=data_df.index).map(
-                str
-            )
+            labels_per_score_per_algo[score][
+                cluster_algo.__class__.__name__
+            ] = pd.Series(pipeline.fit_predict(data_df), index=data_df.index).map(str)
+    return labels_per_score_per_algo
 
+
+def embedding_plot_per_best_config(
+    labels_per_score_per_algo: dict[str, dict[str, pd.Series]],
+    embedding: pd.DataFrame,
+    ground_truth: Optional[pd.Series],
+    save_dir: Path,
+) -> None:
+    for score, labels_per_algo in tqdm(labels_per_score_per_algo.items()):
+        n_cols = 3
+        n_plots = len(labels_per_algo) + 1 * (ground_truth is not None)
+        n_rows = int(n_plots // n_cols + 1 * (n_plots % n_cols > 0))
+        fig = plt.figure(figsize=(n_rows * 10, n_cols * 5))
+
+        for n, (algo_name, labels) in enumerate(labels_per_algo.items()):
             ax = fig.add_subplot(n_rows, n_cols, n + 1)
             sns.scatterplot(
                 data=embedding,
@@ -154,7 +164,7 @@ def embedding_plot_per_best_config(
                 hue=labels,
                 ax=ax,
             )
-            ax.set_title(str(pipeline))
+            ax.set_title(algo_name)
         if ground_truth is not None:
             ax = fig.add_subplot(n_rows, n_cols, n + 2)
             sns.scatterplot(
@@ -204,6 +214,11 @@ def main(
         if not skip_embedding and len(results_dirs) == 1:
             data_df, ground_truth = DATASETS[dataset]()
 
+            labels_per_score_per_algo = get_best_labels_per_score_per_algo(
+                results_df,
+                data_df,
+            )
+
             embedding = pd.DataFrame(
                 TSNE(
                     n_components=2, random_state=SEED, perplexity=30, metric="manhattan"
@@ -216,8 +231,7 @@ def main(
             tsne_dir.mkdir(exist_ok=True)
 
             embedding_plot_per_best_config(
-                results_df,
-                data_df,
+                labels_per_score_per_algo,
                 embedding,
                 ground_truth,
                 tsne_dir,
@@ -233,8 +247,7 @@ def main(
             pca_dir.mkdir(exist_ok=True)
 
             embedding_plot_per_best_config(
-                results_df,
-                data_df,
+                labels_per_score_per_algo,
                 embedding,
                 ground_truth,
                 pca_dir,
@@ -250,8 +263,7 @@ def main(
             umap_dir.mkdir(exist_ok=True)
 
             embedding_plot_per_best_config(
-                results_df,
-                data_df,
+                labels_per_score_per_algo,
                 embedding,
                 ground_truth,
                 umap_dir,
