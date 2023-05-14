@@ -160,7 +160,7 @@ def build_param_grid(
         # ],
         "OPTICS": {
             "reduce_dim": reduce_dim,
-            "cluster_algo": [OPTICS(cluster_method="dbscan", metric="euclidean")],
+            "cluster_algo": [OPTICS(cluster_method="xi", metric="euclidean")],
             "cluster_algo__min_samples": min_samples_values,
         },
         # "GaussianMixture": {
