@@ -20,8 +20,10 @@ from utils import (
     load_gemler_data_normed,
     load_gemler_pca_param_grid,
     load_gemler_standard_param_grid,
+    load_gemler_quantile_param_grid,
     load_metabric_data_normed,
     load_metabric_standard_param_grid,
+    load_metabric_quantile_param_grid,
     load_metabric_pca_param_grid,
     make_clustering_scorer_supervised,
     make_clustering_scorer_unsupervised,
@@ -45,13 +47,13 @@ RESULTS_DIR.mkdir(exist_ok=True)
 DATASETS = [
     (
         "GEMLER",
-        load_gemler_data_normed(StandardScaler()),
-        load_gemler_standard_param_grid,
+        load_gemler_data_normed(QuantileTransformer()),
+        load_gemler_quantile_param_grid,
     ),
     (
         "METABRIC",
-        load_metabric_data_normed(StandardScaler()),
-        load_metabric_standard_param_grid,
+        load_metabric_data_normed(QuantileTransformer()),
+        load_metabric_quantile_param_grid,
     ),
 ]
 

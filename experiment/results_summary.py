@@ -27,15 +27,10 @@ from umap.umap_ import UMAP
 from utils import SEED, load_gemler_data_normed, load_metabric_data_normed
 
 DATASETS = {
-    "GEMLER": load_gemler_data_normed(StandardScaler()),
-    "METABRIC": load_metabric_data_normed(StandardScaler()),
+    "GEMLER": load_gemler_data_normed(QuantileTransformer()),
+    "METABRIC": load_metabric_data_normed(QuantileTransformer()),
 }
-# DATASETS = {
-#     "GEMLER_StandardScaler": load_gemler_data_normed(StandardScaler()),
-#     "METABRIC_StandardScaler": load_metabric_data_normed(StandardScaler()),
-#     "GEMLER_QuantileScaler": load_gemler_data_normed(QuantileTransformer()),
-#     "METABRIC_QuantileScaler": load_metabric_data_normed(QuantileTransformer()),
-# }
+
 SCORES = [
     ("silhouette", lambda x: max(x[~x.isna()], default=None)),
     ("calinski_harabasz", lambda x: max(x[~x.isna()], default=None)),
