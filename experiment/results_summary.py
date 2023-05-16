@@ -27,8 +27,8 @@ from umap.umap_ import UMAP
 from utils import SEED, load_gemler_data_normed, load_metabric_data_normed
 
 DATASETS = {
-    "GEMLER": load_gemler_data_normed(QuantileTransformer()),
-    "METABRIC": load_metabric_data_normed(QuantileTransformer()),
+    "GEMLER": load_gemler_data_normed(),
+    "METABRIC": load_metabric_data_normed(),
 }
 
 SCORES = [

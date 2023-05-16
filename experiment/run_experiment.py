@@ -27,6 +27,7 @@ from utils import (
     load_metabric_pca_param_grid,
     make_clustering_scorer_supervised,
     make_clustering_scorer_unsupervised,
+    WholeDatasetCV,
 )
 
 EXPERIMENT_DIR = Path(__file__).parent
@@ -47,12 +48,12 @@ RESULTS_DIR.mkdir(exist_ok=True)
 DATASETS = [
     (
         "GEMLER",
-        load_gemler_data_normed(QuantileTransformer()),
+        load_gemler_data_normed(),
         load_gemler_quantile_param_grid,
     ),
     (
         "METABRIC",
-        load_metabric_data_normed(QuantileTransformer()),
+        load_metabric_data_normed(),
         load_metabric_quantile_param_grid,
     ),
 ]
@@ -62,6 +63,8 @@ CV_REPEATS = 5
 CV_SCHEME = RepeatedStratifiedKFold(
     n_repeats=CV_REPEATS, n_splits=CV_SPLITS, random_state=SEED
 )
+# CV_REPEATS = 5
+# CV_SCHEME = WholeDatasetCV(n_repeats=CV_REPEATS, shuffle_each_repeat=True)
 
 
 SCORERS = {

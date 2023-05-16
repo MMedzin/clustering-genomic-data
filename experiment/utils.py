@@ -19,6 +19,7 @@ from sklearn.cluster import (
 from sklearn.decomposition import PCA
 from sklearn.ensemble import IsolationForest
 from sklearn.mixture import GaussianMixture
+from sklearn.model_selection import BaseCrossValidator
 from sklearn.neighbors import LocalOutlierFactor
 from sklearn.preprocessing import FunctionTransformer, MinMaxScaler
 from sklearn_extra.cluster import KMedoids
@@ -130,79 +131,79 @@ def build_param_grid(
             "cluster_algo__n_clusters": k_values,
             "cluster_algo__init": k_means_init,
         },
-        "KMedoids": {
-            "reduce_dim": reduce_dim,
-            "cluster_algo": [KMedoids(random_state=SEED)],
-            "cluster_algo__n_clusters": k_values,
-            "cluster_algo__init": k_medoids_init,
-        },
-        "AgglomerativeClustering": {
-            "reduce_dim": reduce_dim,
-            "cluster_algo": [AgglomerativeClustering()],
-            "cluster_algo__n_clusters": k_values,
-            "cluster_algo__linkage": linkage_values,
-        },
-        "Birch": {
-            "reduce_dim": reduce_dim,
-            "cluster_algo": [Birch()],
-            "cluster_algo__threshold": birch_threshold_values,
-            "cluster_algo__branching_factor": birch_branching_factor_values,
-            "cluster_algo__n_clusters": list(k_values) + [None],
-        },
-        "DBSCAN": [
-            {
-                "reduce_dim": reduce_dim,
-                "cluster_algo": [DBSCAN()],
-                "cluster_algo__eps": [eps],
-                "cluster_algo__min_samples": [min_samples],
-            }
-            for eps, min_samples in zip(eps_values, min_samples_values)
-        ],
-        "OPTICS": {
-            "reduce_dim": reduce_dim,
-            "cluster_algo": [OPTICS(cluster_method="xi", metric="euclidean")],
-            "cluster_algo__min_samples": min_samples_values,
-        },
-        "GaussianMixture": {
-            "reduce_dim": [PCA(n_components=pca_components)],
-            "cluster_algo": [GaussianMixture(random_state=SEED)],
-            "cluster_algo__n_components": k_values,
-            "cluster_algo__covariance_type": covariance_type_values,
-        },
-        "SOM": [  # sklearn_som version
-            {
-                "reduce_dim": reduce_dim,
-                "cluster_algo": [SOM(dim=features_count, random_state=SEED)],
-                "cluster_algo__epochs": som_epochs,
-                "cluster_algo__m": [k1],
-                "cluster_algo__n": [k2],
-            }
-            for k1, k2 in product([1] + list(k_values), list(k_values))
-            if k1 * k2 <= max(k_values)
-        ],
-        "AffinityPropagation": {
-            "reduce_dim": reduce_dim,
-            "cluster_algo": [AffinityPropagation(random_state=SEED)],
-            "cluster_algo__damping": affinity_prop_dumping_values,
-            "cluster_algo__preference": affinity_prop_preference_values,
-        },
-        "SpectralClustering": [
-            {
-                "reduce_dim": reduce_dim,
-                "cluster_algo": [SpectralClustering(random_state=SEED)],
-                "cluster_algo__n_clusters": k_values,
-                "cluster_algo__affinity": ["rbf"],
-                "cluster_algo__assign_labels": ["kmeans", "discretize", "cluster_qr"],
-            },
-            {
-                "reduce_dim": reduce_dim,
-                "cluster_algo": [SpectralClustering(random_state=SEED)],
-                "cluster_algo__n_clusters": k_values,
-                "cluster_algo__affinity": ["nearest_neighbors"],
-                "cluster_algo__n_neighbors": min_samples_values,
-                "cluster_algo__assign_labels": ["kmeans", "discretize", "cluster_qr"],
-            },
-        ],
+        # "KMedoids": {
+        #     "reduce_dim": reduce_dim,
+        #     "cluster_algo": [KMedoids(random_state=SEED)],
+        #     "cluster_algo__n_clusters": k_values,
+        #     "cluster_algo__init": k_medoids_init,
+        # },
+        # "AgglomerativeClustering": {
+        #     "reduce_dim": reduce_dim,
+        #     "cluster_algo": [AgglomerativeClustering()],
+        #     "cluster_algo__n_clusters": k_values,
+        #     "cluster_algo__linkage": linkage_values,
+        # },
+        # "Birch": {
+        #     "reduce_dim": reduce_dim,
+        #     "cluster_algo": [Birch()],
+        #     "cluster_algo__threshold": birch_threshold_values,
+        #     "cluster_algo__branching_factor": birch_branching_factor_values,
+        #     "cluster_algo__n_clusters": list(k_values) + [None],
+        # },
+        # "DBSCAN": [
+        #     {
+        #         "reduce_dim": reduce_dim,
+        #         "cluster_algo": [DBSCAN()],
+        #         "cluster_algo__eps": [eps],
+        #         "cluster_algo__min_samples": [min_samples],
+        #     }
+        #     for eps, min_samples in zip(eps_values, min_samples_values)
+        # ],
+        # "OPTICS": {
+        #     "reduce_dim": reduce_dim,
+        #     "cluster_algo": [OPTICS(cluster_method="xi", metric="euclidean")],
+        #     "cluster_algo__min_samples": min_samples_values,
+        # },
+        # "GaussianMixture": {
+        #     "reduce_dim": [PCA(n_components=pca_components)],
+        #     "cluster_algo": [GaussianMixture(random_state=SEED)],
+        #     "cluster_algo__n_components": k_values,
+        #     "cluster_algo__covariance_type": covariance_type_values,
+        # },
+        # "SOM": [  # sklearn_som version
+        #     {
+        #         "reduce_dim": reduce_dim,
+        #         "cluster_algo": [SOM(dim=features_count, random_state=SEED)],
+        #         "cluster_algo__epochs": som_epochs,
+        #         "cluster_algo__m": [k1],
+        #         "cluster_algo__n": [k2],
+        #     }
+        #     for k1, k2 in product([1] + list(k_values), list(k_values))
+        #     if k1 * k2 <= max(k_values)
+        # ],
+        # "AffinityPropagation": {
+        #     "reduce_dim": reduce_dim,
+        #     "cluster_algo": [AffinityPropagation(random_state=SEED)],
+        #     "cluster_algo__damping": affinity_prop_dumping_values,
+        #     "cluster_algo__preference": affinity_prop_preference_values,
+        # },
+        # "SpectralClustering": [
+        #     {
+        #         "reduce_dim": reduce_dim,
+        #         "cluster_algo": [SpectralClustering(random_state=SEED)],
+        #         "cluster_algo__n_clusters": k_values,
+        #         "cluster_algo__affinity": ["rbf"],
+        #         "cluster_algo__assign_labels": ["kmeans", "discretize", "cluster_qr"],
+        #     },
+        #     {
+        #         "reduce_dim": reduce_dim,
+        #         "cluster_algo": [SpectralClustering(random_state=SEED)],
+        #         "cluster_algo__n_clusters": k_values,
+        #         "cluster_algo__affinity": ["nearest_neighbors"],
+        #         "cluster_algo__n_neighbors": min_samples_values,
+        #         "cluster_algo__assign_labels": ["kmeans", "discretize", "cluster_qr"],
+        #     },
+        # ],
     }
 
 
@@ -759,3 +760,27 @@ def clusters_count_scorer(
 ) -> int:
     labels = estimator.fit_predict(X)
     return len(np.unique(labels))
+
+
+class WholeDatasetCV(BaseCrossValidator):
+    def __init__(self, n_repeats=1, shuffle_each_repeat=False, random_state=None):
+        self.n_repeats = n_repeats
+        self.random_state = random_state
+        self.shuffle_each_repeat = shuffle_each_repeat
+
+    def get_n_splits(self, X=None, y=None, groups=None):
+        return self.n_repeats
+
+    def split(self, X, y=None, groups=None):
+        n_samples = len(X)
+        indices = np.arange(n_samples)
+        rng = np.random.RandomState(self.random_state)
+        rng.shuffle(indices)
+
+        for _ in range(self.n_repeats):
+            if self.shuffle_each_repeat:
+                rng.shuffle(indices)
+            yield indices, indices
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}(n_repeats={self.n_repeats}, shuffle_each_repeat={self.shuffle_each_repeat}, random_state={self.random_state})"
