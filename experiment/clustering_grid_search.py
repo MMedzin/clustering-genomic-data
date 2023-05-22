@@ -102,7 +102,7 @@ class ClusteringGridSearchCV:
         return results_df
 
     def fit(self, X: pd.DataFrame, y: pd.Series) -> ClusteringGridSearchCV:
-        parallel = Parallel(n_jobs=self.n_jobs)
+        parallel = Parallel(n_jobs=self.n_jobs, backend="loky")
         with parallel:
             results = parallel(
                 delayed(run_single_evaluation)(
