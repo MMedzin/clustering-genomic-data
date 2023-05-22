@@ -218,11 +218,11 @@ def load_gemler_minmax_param_grid() -> list[dict]:
     K_MEDOIDS_INIT = ["k-medoids++", "random"]
     LINKAGE_VALUES = ["ward", "complete", "average", "single"]
     BIRCH_THRESHOLD_VALUES = [
+        0.2642900288766189,
+        0.5285800577532378,
+        0.7928700866298567,
+        1.0571601155064756,
         1.3214501443830946,
-        2.642900288766189,
-        3.964350433149284,
-        5.285800577532378,
-        6.607250721915473,
     ]
     BIRCH_BRANCHING_FACTOR_VALUES = [5, 28, 52, 76, 100]
     EPS_VALUES = [
@@ -280,11 +280,11 @@ def load_gemler_standard_param_grid() -> list[dict]:
     K_MEDOIDS_INIT = ["k-medoids++", "random"]
     LINKAGE_VALUES = ["ward", "complete", "average", "single"]
     BIRCH_THRESHOLD_VALUES = [
+        2.86387821312995,
+        5.7277564262599,
+        8.591634639389849,
+        11.4555128525198,
         14.31939106564975,
-        28.6387821312995,
-        42.95817319694925,
-        57.277564262599,
-        71.59695532824875,
     ]
     BIRCH_BRANCHING_FACTOR_VALUES = [5, 28, 52, 76, 100]
     EPS_VALUES = [
@@ -342,11 +342,11 @@ def load_gemler_quantile_param_grid() -> list[dict]:
     K_MEDOIDS_INIT = ["k-medoids++", "random"]
     LINKAGE_VALUES = ["ward", "complete", "average", "single"]
     BIRCH_THRESHOLD_VALUES = [
+        0.5622221243895874,
+        1.1244442487791748,
+        1.6866663731687623,
+        2.2488884975583496,
         2.811110621947937,
-        5.622221243895874,
-        8.433331865843812,
-        11.244442487791748,
-        14.055553109739684,
     ]
     BIRCH_BRANCHING_FACTOR_VALUES = [5, 28, 52, 76, 100]
     EPS_VALUES = [
@@ -404,11 +404,11 @@ def load_gemler_pca_param_grid() -> list[dict]:
     K_MEDOIDS_INIT = ["k-medoids++", "random"]
     LINKAGE_VALUES = ["ward", "complete", "average", "single"]
     BIRCH_THRESHOLD_VALUES = [
-        14.050935244640678,
-        28.101870489281357,
-        42.15280573392204,
-        56.20374097856271,
-        70.25467622320339,
+        2.8066787626099616,
+        5.613357525219923,
+        8.420036287829884,
+        11.226715050439847,
+        14.033393813049807,
     ]
     BIRCH_BRANCHING_FACTOR_VALUES = [5, 28, 52, 76, 100]
     EPS_VALUES = [
@@ -488,11 +488,11 @@ def load_metabric_minmax_param_grid() -> list[dict]:
     K_MEDOIDS_INIT = ["k-medoids++", "random"]
     LINKAGE_VALUES = ["ward", "complete", "average", "single"]
     BIRCH_THRESHOLD_VALUES = [
+        0.45665479428002376,
+        0.9133095885600475,
+        1.3699643828400712,
+        1.826619177120095,
         2.283273971400119,
-        4.566547942800238,
-        6.849821914200357,
-        9.133095885600476,
-        11.416369857000594,
     ]
     BIRCH_BRANCHING_FACTOR_VALUES = [5, 28, 52, 76, 100]
     EPS_VALUES = [
@@ -551,11 +551,11 @@ def load_metabric_standard_param_grid() -> list[dict]:
     K_MEDOIDS_INIT = ["k-medoids++", "random"]
     LINKAGE_VALUES = ["ward", "complete", "average", "single"]
     BIRCH_THRESHOLD_VALUES = [
+        3.8266374470120055,
+        7.653274894024011,
+        11.479912341036016,
+        15.306549788048022,
         19.133187235060028,
-        38.266374470120056,
-        57.39956170518008,
-        76.53274894024011,
-        95.66593617530015,
     ]
     BIRCH_BRANCHING_FACTOR_VALUES = [5, 28, 52, 76, 100]
     EPS_VALUES = [
@@ -613,11 +613,11 @@ def load_metabric_quantile_param_grid() -> list[dict]:
     K_MEDOIDS_INIT = ["k-medoids++", "random"]
     LINKAGE_VALUES = ["ward", "complete", "average", "single"]
     BIRCH_THRESHOLD_VALUES = [
+        0.8243545803354415,
+        1.648709160670883,
+        2.4730637410063245,
+        3.297418321341766,
         4.121772901677208,
-        8.243545803354415,
-        12.365318705031623,
-        16.48709160670883,
-        20.608864508386038,
     ]
     BIRCH_BRANCHING_FACTOR_VALUES = [5, 28, 52, 76, 100]
     EPS_VALUES = [
@@ -675,11 +675,11 @@ def load_metabric_pca_param_grid() -> list[dict]:
     K_MEDOIDS_INIT = ["k-medoids++", "random"]
     LINKAGE_VALUES = ["ward", "complete", "average", "single"]
     BIRCH_THRESHOLD_VALUES = [
-        18.272505069939488,
-        36.545010139878976,
-        54.81751520981847,
-        73.09002027975795,
-        91.36252534969744,
+        3.6398912746529795,
+        7.279782549305959,
+        10.919673823958938,
+        14.559565098611918,
+        18.199456373264898,
     ]
     BIRCH_BRANCHING_FACTOR_VALUES = [5, 28, 52, 76, 100]
     EPS_VALUES = [
