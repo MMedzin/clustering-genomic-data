@@ -21,6 +21,7 @@ from sklearn.ensemble import IsolationForest
 from sklearn.mixture import GaussianMixture
 from sklearn.model_selection import BaseCrossValidator
 from sklearn.neighbors import LocalOutlierFactor
+from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import FunctionTransformer, MinMaxScaler
 from sklearn_extra.cluster import KMedoids
 from sklearn_som.som import SOM
@@ -123,7 +124,7 @@ def build_param_grid(
     affinity_prop_preference_values: list[float],
     pca_components: int,
     features_count: int,
-) -> list[dict]:
+) -> dict:
     return {
         "KMeans": {
             "reduce_dim": reduce_dim,
@@ -753,12 +754,38 @@ def make_clustering_scorer_supervised(score_func: Callable) -> Callable:
     return scorer
 
 
+def make_clustering_label_scorer_unsupervised(score_func: Callable) -> Callable:
+    def scorer(labels: pd.Series, X: Union[pd.DataFrame, np.array], _y: Any) -> float:
+        return score_func(X, labels)
+
+    return scorer
+
+
+def make_clustering_label_scorer_supervised(score_func: Callable) -> Callable:
+    def scorer(
+        labels: pd.Series,
+        X: Union[pd.DataFrame, np.array],
+        y: Union[pd.Series, np.array],
+    ) -> float:
+        return score_func(y, labels)
+
+    return scorer
+
+
 def clusters_count_scorer(
     estimator: BaseEstimator,
     X: Union[pd.DataFrame, np.array],
     y: Union[pd.Series, np.array],
 ) -> int:
     labels = estimator.fit_predict(X)
+    return len(np.unique(labels))
+
+
+def clusters_count_label_scorer(
+    labels: pd.Series,
+    X: Union[pd.DataFrame, np.array],
+    y: Union[pd.Series, np.array],
+) -> int:
     return len(np.unique(labels))
 
 
@@ -784,3 +811,15 @@ class WholeDatasetCV(BaseCrossValidator):
 
     def __repr__(self):
         return f"{self.__class__.__name__}(n_repeats={self.n_repeats}, shuffle_each_repeat={self.shuffle_each_repeat}, random_state={self.random_state})"
+
+
+def get_pipeline_from_params(param_dict: dict) -> Pipeline:
+    reduce_dim = (
+        param_dict["reduce_dim"] if "reduce_dim" in param_dict else "passthrough"
+    )
+    cluster_algo = param_dict["cluster_algo"]
+    for key, value in param_dict.items():
+        if key in ["cluster_algo", "reduce_dim"]:
+            continue
+        setattr(cluster_algo, key[len("cluster_algo__") :], value)
+    return Pipeline([("reduce_dim", reduce_dim), ("cluster_algo", cluster_algo)])

@@ -24,7 +24,12 @@ from sklearn_extra.cluster import KMedoids
 from sklearn_som.som import SOM
 from tqdm.auto import tqdm
 from umap.umap_ import UMAP
-from utils import SEED, load_gemler_data_normed, load_metabric_data_normed
+from utils import (
+    SEED,
+    load_gemler_data_normed,
+    load_metabric_data_normed,
+    get_pipeline_from_params,
+)
 
 DATASETS = {
     "GEMLER": load_gemler_data_normed(),
@@ -118,23 +123,12 @@ def get_best_labels_per_score_per_algo(
         best_results_params = results_df.loc[best_ids, "params"].map(lambda x: eval(x))
 
         for param_dict in best_results_params:
-            reduce_dim = (
-                param_dict["reduce_dim"]
-                if "reduce_dim" in param_dict
-                else "passthrough"
-            )
+            pipeline = get_pipeline_from_params(param_dict)
             cluster_algo = param_dict["cluster_algo"]
-            for key, value in param_dict.items():
-                if key in ["cluster_algo", "reduce_dim"]:
-                    continue
-                setattr(cluster_algo, key[len("cluster_algo__") :], value)
-            pipeline = Pipeline(
-                [("reduce_dim", reduce_dim), ("cluster_algo", cluster_algo)]
-            )
-
             labels_per_score_per_algo[score][
                 cluster_algo.__class__.__name__
             ] = pd.Series(pipeline.fit_predict(data_df), index=data_df.index).map(str)
+
     return labels_per_score_per_algo
 
 

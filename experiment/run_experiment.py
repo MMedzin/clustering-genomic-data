@@ -17,6 +17,7 @@ from sklearn.preprocessing import LabelEncoder, QuantileTransformer, StandardSca
 from utils import (
     SEED,
     clusters_count_scorer,
+    clusters_count_label_scorer,
     load_gemler_data_normed,
     load_gemler_pca_param_grid,
     load_gemler_standard_param_grid,
@@ -27,8 +28,11 @@ from utils import (
     load_metabric_pca_param_grid,
     make_clustering_scorer_supervised,
     make_clustering_scorer_unsupervised,
+    make_clustering_label_scorer_supervised,
+    make_clustering_label_scorer_unsupervised,
     WholeDatasetCV,
 )
+from clustering_grid_search import ClusteringGridSearchCV
 
 EXPERIMENT_DIR = Path(__file__).parent
 
@@ -58,36 +62,46 @@ DATASETS = [
     ),
 ]
 
-CV_SPLITS = 2
-CV_REPEATS = 5
-CV_SCHEME = RepeatedStratifiedKFold(
-    n_repeats=CV_REPEATS, n_splits=CV_SPLITS, random_state=SEED
-)
+# CV_SPLITS = 2
 # CV_REPEATS = 5
-# CV_SCHEME = WholeDatasetCV(n_repeats=CV_REPEATS, shuffle_each_repeat=True)
+# CV_SCHEME = RepeatedStratifiedKFold(
+#     n_repeats=CV_REPEATS, n_splits=CV_SPLITS, random_state=SEED
+# )
+CV_REPEATS = 5
+CV_SCHEME = WholeDatasetCV(n_repeats=CV_REPEATS, shuffle_each_repeat=True)
 
 
 SCORERS = {
-    "silhouette": make_clustering_scorer_unsupervised(silhouette_score),
-    "calinski_harabasz": make_clustering_scorer_unsupervised(calinski_harabasz_score),
-    "davies_bouldin": make_clustering_scorer_unsupervised(davies_bouldin_score),
-    "adjusted_rand_index": make_clustering_scorer_supervised(adjusted_rand_score),
-    "adjusted_mutual_info": make_clustering_scorer_supervised(
+    "silhouette": make_clustering_label_scorer_unsupervised(silhouette_score),
+    "calinski_harabasz": make_clustering_label_scorer_unsupervised(
+        calinski_harabasz_score
+    ),
+    "davies_bouldin": make_clustering_label_scorer_unsupervised(davies_bouldin_score),
+    "adjusted_rand_index": make_clustering_label_scorer_supervised(adjusted_rand_score),
+    "adjusted_mutual_info": make_clustering_label_scorer_supervised(
         adjusted_mutual_info_score
     ),
-    "clusters_count": clusters_count_scorer,
+    "clusters_count": clusters_count_label_scorer,
 }
 
 
+# def get_grid_search_kwargs(param_grid: Union[list[dict], dict]) -> dict:
+#     return dict(
+#         estimator=Pipeline([("reduce_dim", "passthrough"), ("cluster_algo", None)]),
+#         param_grid=param_grid,
+#         cv=CV_SCHEME,
+#         scoring=SCORERS,
+#         n_jobs=-1,
+#         verbose=2,
+#         refit=list(SCORERS.keys())[0],
+#     )
 def get_grid_search_kwargs(param_grid: Union[list[dict], dict]) -> dict:
     return dict(
-        estimator=Pipeline([("reduce_dim", "passthrough"), ("cluster_algo", None)]),
         param_grid=param_grid,
         cv=CV_SCHEME,
-        scoring=SCORERS,
+        label_scorers=SCORERS,
         n_jobs=-1,
-        verbose=2,
-        refit=list(SCORERS.keys())[0],
+        verbose=True,
     )
 
 
@@ -107,11 +121,12 @@ def main() -> None:
             logging.info("Running GridSearch for %s...", name)
             for i, (algo_name, algo_grid) in enumerate(param_grid_loader().items()):
                 try:
-                    grid_search = GridSearchCV(**get_grid_search_kwargs(algo_grid))
-                    grid_search.fit(
-                        data.values, ground_truth_encoded.loc[data.index].values
+                    grid_search = ClusteringGridSearchCV(
+                        **get_grid_search_kwargs(algo_grid)
                     )
+                    grid_search.fit(data, ground_truth_encoded.loc[data.index])
                     results_df = pd.DataFrame(grid_search.cv_results_)
+                    results_df = results_df.loc[:, results_df.columns.sort_values()]
                     results_df["algo_name"] = algo_name
                     results_df.loc[
                         :, ~results_df.columns.str.startswith("param_")
