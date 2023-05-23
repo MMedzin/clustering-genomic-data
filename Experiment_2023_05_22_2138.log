@@ -1,0 +1,173 @@
+21:38:55,487 root INFO Starting experiment...
+21:38:55,487 root INFO Loading GEMLER data...
+21:39:03,960 root INFO GEMLER was loaded.
+21:39:03,960 root INFO Running GridSearch for GEMLER...
+21:40:21,690 root INFO GEMLER GridSearch done for KMeans.
+21:40:36,579 root INFO GEMLER GridSearch done for KMedoids.
+21:43:14,206 root INFO GEMLER GridSearch done for AgglomerativeClustering.
+21:43:56,937 root CRITICAL Could not pickle object as excessively deep recursion required.
+joblib.externals.loky.process_executor._RemoteTraceback: 
+"""
+Traceback (most recent call last):
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/externals/cloudpickle/cloudpickle_fast.py", line 632, in dump
+    return Pickler.dump(self, obj)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/_memmapping_reducer.py", line 313, in reduce_array_memmap_backward
+    loads, (dumps(np.asarray(a), protocol=HIGHEST_PROTOCOL), )
+RecursionError: maximum recursion depth exceeded while calling a Python object
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/externals/loky/process_executor.py", line 343, in _sendback_result
+    result_queue.put(_ResultItem(work_id, result=result,
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/externals/loky/backend/queues.py", line 186, in put
+    obj = dumps(obj, reducers=self._reducers)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/externals/loky/backend/reduction.py", line 211, in dumps
+    dump(obj, buf, reducers=reducers, protocol=protocol)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/externals/loky/backend/reduction.py", line 204, in dump
+    _LokyPickler(file, reducers=reducers, protocol=protocol).dump(obj)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/externals/cloudpickle/cloudpickle_fast.py", line 639, in dump
+    raise pickle.PicklingError(msg) from e
+_pickle.PicklingError: Could not pickle object as excessively deep recursion required.
+"""
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/michal/clustering-genomic-data/experiment/run_experiment.py", line 129, in main
+    grid_search.fit(data, ground_truth_encoded.loc[data.index])
+  File "/home/michal/clustering-genomic-data/experiment/clustering_grid_search.py", line 107, in fit
+    results = parallel(
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/parallel.py", line 1098, in __call__
+    self.retrieve()
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/parallel.py", line 975, in retrieve
+    self._output.extend(job.get(timeout=self.timeout))
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/_parallel_backends.py", line 567, in wrap_future_result
+    return future.result(timeout=timeout)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/concurrent/futures/_base.py", line 446, in result
+    return self.__get_result()
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/concurrent/futures/_base.py", line 391, in __get_result
+    raise self._exception
+_pickle.PicklingError: Could not pickle object as excessively deep recursion required.
+21:43:56,946 root INFO GEMLER GridSearch failed for Birch. Skipping...
+21:44:06,496 root INFO GEMLER GridSearch done for DBSCAN.
+21:48:24,429 root INFO GEMLER GridSearch done for OPTICS.
+21:48:38,363 root CRITICAL Fitting the mixture model failed because some components have ill-defined empirical covariance (for instance caused by singleton or collapsed samples). Try to decrease the number of components, or increase reg_covar.
+joblib.externals.loky.process_executor._RemoteTraceback: 
+"""
+Traceback (most recent call last):
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/sklearn/mixture/_gaussian_mixture.py", line 331, in _compute_precision_cholesky
+    cov_chol = linalg.cholesky(covariance, lower=True)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/scipy/linalg/_decomp_cholesky.py", line 89, in cholesky
+    c, lower = _cholesky(a, lower=lower, overwrite_a=overwrite_a, clean=True,
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/scipy/linalg/_decomp_cholesky.py", line 37, in _cholesky
+    raise LinAlgError("%d-th leading minor of the array is not positive "
+numpy.linalg.LinAlgError: 113-th leading minor of the array is not positive definite
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/externals/loky/process_executor.py", line 428, in _process_worker
+    r = call_item()
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/externals/loky/process_executor.py", line 275, in __call__
+    return self.fn(*self.args, **self.kwargs)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/_parallel_backends.py", line 620, in __call__
+    return self.func(*args, **kwargs)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/parallel.py", line 288, in __call__
+    return [func(*args, **kwargs)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/parallel.py", line 288, in <listcomp>
+    return [func(*args, **kwargs)
+  File "/home/michal/clustering-genomic-data/experiment/clustering_grid_search.py", line 36, in run_single_evaluation
+    y_pred = pipeline.fit_predict(X)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/sklearn/pipeline.py", line 517, in fit_predict
+    y_pred = self.steps[-1][1].fit_predict(Xt, y, **fit_params_last_step)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/sklearn/mixture/_base.py", line 241, in fit_predict
+    self._initialize_parameters(X, random_state)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/sklearn/mixture/_base.py", line 145, in _initialize_parameters
+    self._initialize(X, resp)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/sklearn/mixture/_gaussian_mixture.py", line 725, in _initialize
+    self.precisions_cholesky_ = _compute_precision_cholesky(
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/sklearn/mixture/_gaussian_mixture.py", line 333, in _compute_precision_cholesky
+    raise ValueError(estimate_precision_error_message)
+ValueError: Fitting the mixture model failed because some components have ill-defined empirical covariance (for instance caused by singleton or collapsed samples). Try to decrease the number of components, or increase reg_covar.
+"""
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/michal/clustering-genomic-data/experiment/run_experiment.py", line 129, in main
+    grid_search.fit(data, ground_truth_encoded.loc[data.index])
+  File "/home/michal/clustering-genomic-data/experiment/clustering_grid_search.py", line 107, in fit
+    results = parallel(
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/parallel.py", line 1098, in __call__
+    self.retrieve()
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/parallel.py", line 975, in retrieve
+    self._output.extend(job.get(timeout=self.timeout))
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/_parallel_backends.py", line 567, in wrap_future_result
+    return future.result(timeout=timeout)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/concurrent/futures/_base.py", line 439, in result
+    return self.__get_result()
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/concurrent/futures/_base.py", line 391, in __get_result
+    raise self._exception
+ValueError: Fitting the mixture model failed because some components have ill-defined empirical covariance (for instance caused by singleton or collapsed samples). Try to decrease the number of components, or increase reg_covar.
+21:48:38,364 root INFO GEMLER GridSearch failed for GaussianMixture. Skipping...
+21:48:47,701 root CRITICAL 792
+joblib.externals.loky.process_executor._RemoteTraceback: 
+"""
+Traceback (most recent call last):
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/pandas/core/indexes/base.py", line 3802, in get_loc
+    return self._engine.get_loc(casted_key)
+  File "pandas/_libs/index.pyx", line 138, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas/_libs/index.pyx", line 165, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas/_libs/hashtable_class_helper.pxi", line 5745, in pandas._libs.hashtable.PyObjectHashTable.get_item
+  File "pandas/_libs/hashtable_class_helper.pxi", line 5753, in pandas._libs.hashtable.PyObjectHashTable.get_item
+KeyError: 792
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/externals/loky/process_executor.py", line 428, in _process_worker
+    r = call_item()
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/externals/loky/process_executor.py", line 275, in __call__
+    return self.fn(*self.args, **self.kwargs)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/_parallel_backends.py", line 620, in __call__
+    return self.func(*args, **kwargs)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/parallel.py", line 288, in __call__
+    return [func(*args, **kwargs)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/parallel.py", line 288, in <listcomp>
+    return [func(*args, **kwargs)
+  File "/home/michal/clustering-genomic-data/experiment/clustering_grid_search.py", line 36, in run_single_evaluation
+    y_pred = pipeline.fit_predict(X)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/sklearn/pipeline.py", line 517, in fit_predict
+    y_pred = self.steps[-1][1].fit_predict(Xt, y, **fit_params_last_step)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/sklearn_som-1.1.0-py3.9.egg/sklearn_som/som.py", line 280, in fit_predict
+    self.fit(X, y)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/sklearn_som-1.1.0-py3.9.egg/sklearn_som/som.py", line 186, in fit
+    input = X[idx]
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/pandas/core/frame.py", line 3807, in __getitem__
+    indexer = self.columns.get_loc(key)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/pandas/core/indexes/base.py", line 3804, in get_loc
+    raise KeyError(key) from err
+KeyError: 792
+"""
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/michal/clustering-genomic-data/experiment/run_experiment.py", line 129, in main
+    grid_search.fit(data, ground_truth_encoded.loc[data.index])
+  File "/home/michal/clustering-genomic-data/experiment/clustering_grid_search.py", line 107, in fit
+    results = parallel(
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/parallel.py", line 1098, in __call__
+    self.retrieve()
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/parallel.py", line 975, in retrieve
+    self._output.extend(job.get(timeout=self.timeout))
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/_parallel_backends.py", line 567, in wrap_future_result
+    return future.result(timeout=timeout)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/concurrent/futures/_base.py", line 439, in result
+    return self.__get_result()
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/concurrent/futures/_base.py", line 391, in __get_result
+    raise self._exception
+KeyError: 792
+21:48:47,701 root INFO GEMLER GridSearch failed for SOM. Skipping...
+21:50:37,730 root INFO GEMLER GridSearch done for AffinityPropagation.
