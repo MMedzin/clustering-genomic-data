@@ -444,7 +444,7 @@ def load_gemler_pca_param_grid() -> list[dict]:
         affinity_prop_dumping_values=AFFINITY_PROP_DUMPING_VALUES,
         affinity_prop_preference_values=AFFINITY_PROP_PREFERENCE_VALUES,
         pca_components=PCA_COMPONENTS,
-        features_count=FEATURES_COUNT,
+        features_count=PCA_COMPONENTS,
     )
 
 
@@ -713,7 +713,7 @@ def load_metabric_pca_param_grid() -> list[dict]:
         affinity_prop_dumping_values=AFFINITY_PROP_DUMPING_VALUES,
         affinity_prop_preference_values=AFFINITY_PROP_PREFERENCE_VALUES,
         pca_components=PCA_COMPONENTS,
-        features_count=FEATURES_COUNT,
+        features_count=PCA_COMPONENTS,
     )
 
 
