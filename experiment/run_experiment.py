@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Union
 
 import pandas as pd
+from clustering_grid_search import ClusteringGridSearchCV
 from sklearn.metrics import (
     adjusted_mutual_info_score,
     adjusted_rand_score,
@@ -16,25 +17,24 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import LabelEncoder, QuantileTransformer, StandardScaler
 from utils import (
     SEED,
-    clusters_count_scorer,
+    WholeDatasetCV,
     clusters_count_label_scorer,
+    clusters_count_scorer,
     load_gemler_data_normed,
-    load_gemler_pca_param_grid,
-    load_gemler_standard_param_grid,
-    load_gemler_quantile_param_grid,
     load_gemler_minmax_param_grid,
+    load_gemler_pca_param_grid,
+    load_gemler_quantile_param_grid,
+    load_gemler_standard_param_grid,
     load_metabric_data_normed,
-    load_metabric_standard_param_grid,
-    load_metabric_quantile_param_grid,
     load_metabric_minmax_param_grid,
     load_metabric_pca_param_grid,
-    make_clustering_scorer_supervised,
-    make_clustering_scorer_unsupervised,
+    load_metabric_quantile_param_grid,
+    load_metabric_standard_param_grid,
     make_clustering_label_scorer_supervised,
     make_clustering_label_scorer_unsupervised,
-    WholeDatasetCV,
+    make_clustering_scorer_supervised,
+    make_clustering_scorer_unsupervised,
 )
-from clustering_grid_search import ClusteringGridSearchCV
 
 EXPERIMENT_DIR = Path(__file__).parent
 
@@ -87,24 +87,26 @@ SCORERS = {
 }
 
 
-# def get_grid_search_kwargs(param_grid: Union[list[dict], dict]) -> dict:
-#     return dict(
-#         estimator=Pipeline([("reduce_dim", "passthrough"), ("cluster_algo", None)]),
-#         param_grid=param_grid,
-#         cv=CV_SCHEME,
-#         scoring=SCORERS,
-#         n_jobs=-1,
-#         verbose=2,
-#         refit=list(SCORERS.keys())[0],
-#     )
 def get_grid_search_kwargs(param_grid: Union[list[dict], dict]) -> dict:
     return dict(
+        estimator=Pipeline([("reduce_dim", "passthrough"), ("cluster_algo", None)]),
         param_grid=param_grid,
         cv=CV_SCHEME,
-        label_scorers=SCORERS,
+        scoring=SCORERS,
         n_jobs=-1,
-        verbose=True,
+        verbose=2,
+        refit=list(SCORERS.keys())[0],
     )
+
+
+# def get_grid_search_kwargs(param_grid: Union[list[dict], dict]) -> dict:
+#     return dict(
+#         param_grid=param_grid,
+#         cv=CV_SCHEME,
+#         label_scorers=SCORERS,
+#         n_jobs=-1,
+#         verbose=True,
+#     )
 
 
 def main() -> None:
@@ -126,7 +128,9 @@ def main() -> None:
                     grid_search = ClusteringGridSearchCV(
                         **get_grid_search_kwargs(algo_grid)
                     )
-                    grid_search.fit(data, ground_truth_encoded.loc[data.index])
+                    grid_search.fit(
+                        data.values, ground_truth_encoded.loc[data.index].values
+                    )
                     results_df = pd.DataFrame(grid_search.cv_results_)
                     results_df = results_df.loc[:, results_df.columns.sort_values()]
                     results_df["algo_name"] = algo_name
