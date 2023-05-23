@@ -52,15 +52,15 @@ RESULTS_DIR = EXPERIMENT_DIR / f"results_{START_TIMESTAMP}"
 RESULTS_DIR.mkdir(exist_ok=True)
 
 DATASETS = [
-    # (
-    #     "GEMLER",
-    #     load_gemler_data_normed(),
-    #     load_gemler_minmax_param_grid,
-    # ),
+    (
+        "GEMLER",
+        load_gemler_data_normed(StandardScaler()),
+        load_gemler_pca_param_grid,
+    ),
     (
         "METABRIC",
-        load_metabric_data_normed(),
-        load_metabric_minmax_param_grid,
+        load_metabric_data_normed(StandardScaler()),
+        load_metabric_pca_param_grid,
     ),
 ]
 
