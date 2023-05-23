@@ -1,0 +1,45 @@
+13:13:49,303 root INFO Starting experiment...
+13:13:49,304 root INFO Loading GEMLER data...
+13:13:57,839 root INFO GEMLER was loaded.
+13:13:57,839 root INFO Running GridSearch for GEMLER...
+13:14:47,153 root INFO GEMLER GridSearch done for KMeans.
+13:14:56,293 root INFO GEMLER GridSearch done for KMedoids.
+13:17:27,813 root INFO GEMLER GridSearch done for AgglomerativeClustering.
+13:17:45,182 root CRITICAL A worker process managed by the executor was unexpectedly terminated. This could be caused by a segmentation fault while calling the function or by an excessive memory usage causing the Operating System to kill the worker.
+
+The exit codes of the workers are {SIGKILL(-9)}
+Traceback (most recent call last):
+  File "/home/michal/clustering-genomic-data/experiment/run_experiment.py", line 131, in main
+    grid_search.fit(
+  File "/home/michal/clustering-genomic-data/experiment/clustering_grid_search.py", line 475, in fit
+    self._run_search(evaluate_candidates)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/sklearn/model_selection/_search.py", line 1388, in _run_search
+    evaluate_candidates(ParameterGrid(self.param_grid))
+  File "/home/michal/clustering-genomic-data/experiment/clustering_grid_search.py", line 422, in evaluate_candidates
+    out = parallel(
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/sklearn/utils/parallel.py", line 63, in __call__
+    return super().__call__(iterable_with_config)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/parallel.py", line 1098, in __call__
+    self.retrieve()
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/parallel.py", line 975, in retrieve
+    self._output.extend(job.get(timeout=self.timeout))
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/_parallel_backends.py", line 567, in wrap_future_result
+    return future.result(timeout=timeout)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/concurrent/futures/_base.py", line 446, in result
+    return self.__get_result()
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/concurrent/futures/_base.py", line 391, in __get_result
+    raise self._exception
+joblib.externals.loky.process_executor.TerminatedWorkerError: A worker process managed by the executor was unexpectedly terminated. This could be caused by a segmentation fault while calling the function or by an excessive memory usage causing the Operating System to kill the worker.
+
+The exit codes of the workers are {SIGKILL(-9)}
+13:17:45,196 root INFO GEMLER GridSearch failed for Birch. Skipping...
+13:17:52,287 root INFO GEMLER GridSearch done for DBSCAN.
+13:21:01,824 root INFO GEMLER GridSearch done for OPTICS.
+13:21:34,166 root INFO GEMLER GridSearch done for GaussianMixture.
+13:27:42,225 root INFO GEMLER GridSearch done for SOM.
+13:29:37,196 root INFO GEMLER GridSearch done for AffinityPropagation.
+15:11:06,163 root INFO GEMLER GridSearch done for SpectralClustering.
+15:11:06,163 root INFO GEMLER GridSearch results saved to csv.
+15:11:06,163 root INFO Loading METABRIC data...
+15:11:10,853 root INFO METABRIC was loaded.
+15:11:10,853 root INFO Running GridSearch for METABRIC...
