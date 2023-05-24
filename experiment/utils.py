@@ -209,6 +209,8 @@ def build_param_grid(
             "cluster_algo__covariance_type": covariance_type_values,
         }
 
+    return param_grid
+
 
 def load_gemler_minmax_param_grid() -> list[dict]:
     """
