@@ -127,7 +127,11 @@ def get_best_labels_per_score_per_algo(
             cluster_algo = param_dict["cluster_algo"]
             labels_per_score_per_algo[score][
                 cluster_algo.__class__.__name__
-            ] = pd.Series(pipeline.fit_predict(data_df), index=data_df.index).map(str)
+            ] = pd.Series(
+                pipeline.fit_predict(data_df.values), index=data_df.index
+            ).map(
+                str
+            )
 
     return labels_per_score_per_algo
 

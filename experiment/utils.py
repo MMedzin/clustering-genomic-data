@@ -342,11 +342,9 @@ def load_gemler_quantile_param_grid() -> list[dict]:
     K_MEDOIDS_INIT = ["k-medoids++", "random"]
     LINKAGE_VALUES = ["ward", "complete", "average", "single"]
     BIRCH_THRESHOLD_VALUES = [
-        0.5622221243895874,
-        1.1244442487791748,
-        1.6866663731687623,
-        2.2488884975583496,
-        2.811110621947937,
+        0.1874073747965291,
+        0.3748147495930582,
+        0.5622221243895873,
     ]
     BIRCH_BRANCHING_FACTOR_VALUES = [5, 28, 52, 76, 100]
     EPS_VALUES = [
