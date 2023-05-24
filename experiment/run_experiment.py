@@ -55,12 +55,12 @@ DATASETS = [
     (
         "GEMLER",
         load_gemler_data_normed(StandardScaler()),
-        load_gemler_pca_param_grid,
+        load_gemler_standard_param_grid,
     ),
     (
         "METABRIC",
         load_metabric_data_normed(StandardScaler()),
-        load_metabric_pca_param_grid,
+        load_metabric_standard_param_grid,
     ),
 ]
 

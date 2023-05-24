@@ -124,8 +124,9 @@ def build_param_grid(
     affinity_prop_preference_values: list[float],
     pca_components: int,
     features_count: int,
+    skip_pca_only: bool = True,
 ) -> dict:
-    return {
+    param_grid = {
         "KMeans": {
             "reduce_dim": reduce_dim,
             "cluster_algo": [KMeans(n_init="auto", random_state=SEED)],
@@ -165,12 +166,6 @@ def build_param_grid(
             "cluster_algo": [OPTICS(cluster_method="xi", metric="euclidean")],
             "cluster_algo__min_samples": min_samples_values,
         },
-        "GaussianMixture": {
-            "reduce_dim": [PCA(n_components=pca_components)],
-            "cluster_algo": [GaussianMixture(random_state=SEED)],
-            "cluster_algo__n_components": k_values,
-            "cluster_algo__covariance_type": covariance_type_values,
-        },
         "SOM": [  # sklearn_som version
             {
                 "reduce_dim": reduce_dim,
@@ -206,6 +201,13 @@ def build_param_grid(
             },
         ],
     }
+    if not skip_pca_only:
+        param_grid["GaussianMixture"] = {
+            "reduce_dim": [PCA(n_components=pca_components)],
+            "cluster_algo": [GaussianMixture(random_state=SEED)],
+            "cluster_algo__n_components": k_values,
+            "cluster_algo__covariance_type": covariance_type_values,
+        }
 
 
 def load_gemler_minmax_param_grid() -> list[dict]:
@@ -278,11 +280,9 @@ def load_gemler_standard_param_grid() -> list[dict]:
     K_MEDOIDS_INIT = ["k-medoids++", "random"]
     LINKAGE_VALUES = ["ward", "complete", "average", "single"]
     BIRCH_THRESHOLD_VALUES = [
-        2.86387821312995,
-        5.7277564262599,
-        8.591634639389849,
-        11.4555128525198,
-        14.31939106564975,
+        0.9546260710433168,
+        1.9092521420866335,
+        2.8638782131299503,
     ]
     BIRCH_BRANCHING_FACTOR_VALUES = [5, 28, 52, 76, 100]
     EPS_VALUES = [
@@ -445,6 +445,7 @@ def load_gemler_pca_param_grid() -> list[dict]:
         affinity_prop_preference_values=AFFINITY_PROP_PREFERENCE_VALUES,
         pca_components=PCA_COMPONENTS,
         features_count=PCA_COMPONENTS,
+        skip_pca_only=False,
     )
 
 
@@ -540,13 +541,7 @@ def load_metabric_standard_param_grid() -> list[dict]:
     K_MEANS_INIT = ["k-means++", "random"]
     K_MEDOIDS_INIT = ["k-medoids++", "random"]
     LINKAGE_VALUES = ["ward", "complete", "average", "single"]
-    BIRCH_THRESHOLD_VALUES = [
-        3.8266374470120055,
-        7.653274894024011,
-        11.479912341036016,
-        15.306549788048022,
-        19.133187235060028,
-    ]
+    BIRCH_THRESHOLD_VALUES = [1.2755458156706687, 2.5510916313413374, 3.826637447012006]
     BIRCH_BRANCHING_FACTOR_VALUES = [5, 28, 52, 76, 100]
     EPS_VALUES = [
         171.5911457792247,
@@ -714,6 +709,7 @@ def load_metabric_pca_param_grid() -> list[dict]:
         affinity_prop_preference_values=AFFINITY_PROP_PREFERENCE_VALUES,
         pca_components=PCA_COMPONENTS,
         features_count=PCA_COMPONENTS,
+        skip_pca_only=False,
     )
 
 
