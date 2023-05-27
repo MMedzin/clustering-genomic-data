@@ -1,0 +1,81 @@
+23:40:18,849 root INFO Starting experiment...
+23:40:18,849 root INFO Loading GEMLER data...
+23:40:27,358 root INFO GEMLER was loaded.
+23:40:27,359 root INFO Running GridSearch for GEMLER...
+23:41:09,392 root INFO GEMLER GridSearch done for KMeans.
+23:41:18,597 root INFO GEMLER GridSearch done for KMedoids.
+23:43:50,934 root INFO GEMLER GridSearch done for AgglomerativeClustering.
+23:55:17,205 root INFO GEMLER GridSearch done for Birch.
+23:55:21,988 root INFO GEMLER GridSearch done for DBSCAN.
+23:58:15,862 root INFO GEMLER GridSearch done for OPTICS.
+00:04:17,930 root INFO GEMLER GridSearch done for SOM.
+00:06:00,814 root INFO GEMLER GridSearch done for AffinityPropagation.
+01:48:25,876 root INFO GEMLER GridSearch done for SpectralClustering.
+01:48:25,876 root INFO GEMLER GridSearch results saved to csv.
+01:48:25,876 root INFO Loading METABRIC data...
+01:48:30,497 root INFO METABRIC was loaded.
+01:48:30,497 root INFO Running GridSearch for METABRIC...
+01:48:38,109 root CRITICAL A worker process managed by the executor was unexpectedly terminated. This could be caused by a segmentation fault while calling the function or by an excessive memory usage causing the Operating System to kill the worker.
+
+The exit codes of the workers are {SIGKILL(-9)}
+Traceback (most recent call last):
+  File "/home/michal/clustering-genomic-data/experiment/run_experiment.py", line 131, in main
+    grid_search.fit(
+  File "/home/michal/clustering-genomic-data/experiment/clustering_grid_search.py", line 475, in fit
+    self._run_search(evaluate_candidates)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/sklearn/model_selection/_search.py", line 1388, in _run_search
+    evaluate_candidates(ParameterGrid(self.param_grid))
+  File "/home/michal/clustering-genomic-data/experiment/clustering_grid_search.py", line 422, in evaluate_candidates
+    out = parallel(
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/sklearn/utils/parallel.py", line 63, in __call__
+    return super().__call__(iterable_with_config)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/parallel.py", line 1098, in __call__
+    self.retrieve()
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/parallel.py", line 975, in retrieve
+    self._output.extend(job.get(timeout=self.timeout))
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/_parallel_backends.py", line 567, in wrap_future_result
+    return future.result(timeout=timeout)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/concurrent/futures/_base.py", line 446, in result
+    return self.__get_result()
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/concurrent/futures/_base.py", line 391, in __get_result
+    raise self._exception
+joblib.externals.loky.process_executor.TerminatedWorkerError: A worker process managed by the executor was unexpectedly terminated. This could be caused by a segmentation fault while calling the function or by an excessive memory usage causing the Operating System to kill the worker.
+
+The exit codes of the workers are {SIGKILL(-9)}
+01:48:38,125 root INFO METABRIC GridSearch failed for KMeans. Skipping...
+01:49:25,899 root INFO METABRIC GridSearch done for KMedoids.
+02:07:13,423 root INFO METABRIC GridSearch done for AgglomerativeClustering.
+02:07:32,908 root CRITICAL A worker process managed by the executor was unexpectedly terminated. This could be caused by a segmentation fault while calling the function or by an excessive memory usage causing the Operating System to kill the worker.
+
+The exit codes of the workers are {SIGKILL(-9)}
+Traceback (most recent call last):
+  File "/home/michal/clustering-genomic-data/experiment/run_experiment.py", line 131, in main
+    grid_search.fit(
+  File "/home/michal/clustering-genomic-data/experiment/clustering_grid_search.py", line 475, in fit
+    self._run_search(evaluate_candidates)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/sklearn/model_selection/_search.py", line 1388, in _run_search
+    evaluate_candidates(ParameterGrid(self.param_grid))
+  File "/home/michal/clustering-genomic-data/experiment/clustering_grid_search.py", line 422, in evaluate_candidates
+    out = parallel(
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/sklearn/utils/parallel.py", line 63, in __call__
+    return super().__call__(iterable_with_config)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/parallel.py", line 1098, in __call__
+    self.retrieve()
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/parallel.py", line 975, in retrieve
+    self._output.extend(job.get(timeout=self.timeout))
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/site-packages/joblib/_parallel_backends.py", line 567, in wrap_future_result
+    return future.result(timeout=timeout)
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/concurrent/futures/_base.py", line 446, in result
+    return self.__get_result()
+  File "/home/michal/miniconda3/envs/clustering-genomic/lib/python3.9/concurrent/futures/_base.py", line 391, in __get_result
+    raise self._exception
+joblib.externals.loky.process_executor.TerminatedWorkerError: A worker process managed by the executor was unexpectedly terminated. This could be caused by a segmentation fault while calling the function or by an excessive memory usage causing the Operating System to kill the worker.
+
+The exit codes of the workers are {SIGKILL(-9)}
+02:07:32,916 root INFO METABRIC GridSearch failed for Birch. Skipping...
+02:07:56,390 root INFO METABRIC GridSearch done for DBSCAN.
+02:23:55,211 root INFO METABRIC GridSearch done for OPTICS.
+03:08:50,158 root INFO METABRIC GridSearch done for SOM.
+03:12:29,509 root INFO METABRIC GridSearch done for AffinityPropagation.
+10:41:18,244 root INFO METABRIC GridSearch done for SpectralClustering.
+10:41:18,245 root INFO METABRIC GridSearch results saved to csv.

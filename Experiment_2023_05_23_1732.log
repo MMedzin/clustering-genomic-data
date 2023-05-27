@@ -1,0 +1,29 @@
+17:32:18,619 root INFO Starting experiment...
+17:32:18,620 root INFO Loading GEMLER data...
+17:32:27,82 root INFO GEMLER was loaded.
+17:32:27,82 root INFO Running GridSearch for GEMLER...
+17:32:46,516 root INFO GEMLER GridSearch done for KMeans.
+17:33:04,578 root INFO GEMLER GridSearch done for KMedoids.
+17:33:38,877 root INFO GEMLER GridSearch done for AgglomerativeClustering.
+17:35:59,833 root INFO GEMLER GridSearch done for Birch.
+17:36:05,244 root INFO GEMLER GridSearch done for DBSCAN.
+17:36:13,878 root INFO GEMLER GridSearch done for OPTICS.
+17:36:42,306 root INFO GEMLER GridSearch done for GaussianMixture.
+17:38:02,244 root INFO GEMLER GridSearch done for SOM.
+17:40:06,934 root INFO GEMLER GridSearch done for AffinityPropagation.
+19:06:30,77 root INFO GEMLER GridSearch done for SpectralClustering.
+19:06:30,77 root INFO GEMLER GridSearch results saved to csv.
+19:06:30,77 root INFO Loading METABRIC data...
+19:06:34,945 root INFO METABRIC was loaded.
+19:06:34,945 root INFO Running GridSearch for METABRIC...
+19:07:58,60 root INFO METABRIC GridSearch done for KMeans.
+19:09:21,550 root INFO METABRIC GridSearch done for KMedoids.
+19:12:08,84 root INFO METABRIC GridSearch done for AgglomerativeClustering.
+19:22:44,793 root INFO METABRIC GridSearch done for Birch.
+19:23:08,76 root INFO METABRIC GridSearch done for DBSCAN.
+19:23:44,184 root INFO METABRIC GridSearch done for OPTICS.
+19:26:00,153 root INFO METABRIC GridSearch done for GaussianMixture.
+19:32:54,230 root INFO METABRIC GridSearch done for SOM.
+19:38:39,888 root INFO METABRIC GridSearch done for AffinityPropagation.
+01:12:27,246 root INFO METABRIC GridSearch done for SpectralClustering.
+01:12:27,246 root INFO METABRIC GridSearch results saved to csv.
