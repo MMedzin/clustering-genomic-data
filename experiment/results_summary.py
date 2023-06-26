@@ -405,7 +405,7 @@ def main(
 
         boxplot_scores_per_best_config(
             results_df,
-            output_dir / f"{dataset}_best_config_scores.png",
+            output_dir / f"{dataset}_best_config_scores_{CLUSTERS_COUNT_STR}.png",
             score_groups,
             static_score=CLUSTERS_COUNT_STR,
         )
