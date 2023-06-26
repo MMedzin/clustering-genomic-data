@@ -38,17 +38,33 @@ DATASETS = {
     "METABRIC": load_metabric_data_normed(),
 }
 
+CLUSTERS_COUNT_STR = "clusters_count"
+
 SCORES = {
     "silhouette": lambda x: max(x[~x.isna()], default=None),
     "calinski_harabasz": lambda x: max(x[~x.isna()], default=None),
     "davies_bouldin": lambda x: min(x[~x.isna()], default=None),
     "adjusted_rand_index": lambda x: max(x[(x != 0) & (~x.isna())], default=None),
     "adjusted_mutual_info": lambda x: max(x[(x > 0) & (~x.isna())], default=None),
+    "adjusted_mutual_info": lambda x: max(x[(x > 0) & (~x.isna())], default=None),
 }
 
 SCORES_GROUPS = {
-    "unsupervised": ["silhouette", "calinski_harabasz", "davies_bouldin"],
-    "supervised": ["adjusted_rand_index", "adjusted_mutual_info"],
+    "none": {"": (" ", list(SCORES.keys()))},
+    "ground-truth": {
+        "internal": (
+            " internal ",
+            ["silhouette", "calinski_harabasz", "davies_bouldin"],
+        ),
+        "external": (" external ", ["adjusted_rand_index", "adjusted_mutual_info"]),
+    },
+    "individual": {
+        "silhouette": (None, ["silhouette"]),
+        "calinski_harabasz": (None, ["calinski_harabasz"]),
+        "davies_bouldin": (None, ["davies_bouldin"]),
+        "adjusted_rand_index": (None, ["adjusted_rand_index"]),
+        "adjusted_mutual_info": (None, ["adjusted_mutual_info"]),
+    },
 }
 
 SCORES_PRETTY_NAMES = {
@@ -57,6 +73,7 @@ SCORES_PRETTY_NAMES = {
     "davies_bouldin": "Davies-Bouldin Index",
     "adjusted_rand_index": "Adjusted Rand Index",
     "adjusted_mutual_info": "Adjusted Mutual Info.",
+    CLUSTERS_COUNT_STR: "clusters count",
 }
 
 ALGO_GROUPS = {
@@ -96,13 +113,18 @@ def path_list_parse(arg: str, delim: str = ",") -> list[Path]:
 
 
 def boxplot_mean_scores_per_algo(
-    results_df: pd.DataFrame, save_path: Path, split_score_groups: bool = False
+    results_df: pd.DataFrame,
+    save_path: Path,
+    score_groups_str: str = "none",
+    additional_score_groups: Optional[list[tuple[str, tuple[str, list[str]]]]] = None,
 ) -> None:
-    if split_score_groups:
-        scores_groups = SCORES_GROUPS
-    else:
-        scores_groups = {"": list(SCORES.keys())}
-    for group_name, group_scores in scores_groups.items():
+    scores_groups = SCORES_GROUPS[score_groups_str]
+    additional_scores_list = (
+        additional_score_groups if additional_score_groups is not None else []
+    )
+    for group_name, (printable_group_name, group_scores) in (
+        list(scores_groups.items()) + additional_scores_list
+    ):
         n_cols = 3 if len(group_scores) > 3 else len(group_scores)
         n_rows = int(len(group_scores) // n_cols + 1 * (len(group_scores) % n_cols > 0))
         fig = plt.figure(figsize=((n_cols + 1) * 5, n_rows * 5))
@@ -138,9 +160,10 @@ def boxplot_mean_scores_per_algo(
             ax.legend([], [], frameon=False)
             ax.set_xlabel("")
 
-        fig.suptitle(
-            f"Mean{' ' + group_name if group_name != '' else ''} scores for differnt hyperparameters"
-        )
+        if printable_group_name is not None:
+            fig.suptitle(
+                f"Mean{printable_group_name}scores for differnt hyperparameters"
+            )
         plt.legend(loc="lower left", bbox_to_anchor=(1.05, 0.4))
         plt.tight_layout()
         fig.savefig(
@@ -150,13 +173,13 @@ def boxplot_mean_scores_per_algo(
 
 
 def boxplot_scores_per_best_config(
-    results_df: pd.DataFrame, save_path: Path, split_score_groups: bool = False
+    results_df: pd.DataFrame,
+    save_path: Path,
+    score_groups_str: str = "none",
+    static_score: Optional[str] = None,
 ) -> None:
-    if split_score_groups:
-        scores_groups = SCORES_GROUPS
-    else:
-        scores_groups = {"": list(SCORES.keys())}
-    for group_name, group_scores in scores_groups.items():
+    scores_groups = SCORES_GROUPS[score_groups_str]
+    for group_name, (printable_group_name, group_scores) in scores_groups.items():
         n_cols = 3 if len(group_scores) > 3 else len(group_scores)
         n_rows = int(len(group_scores) // n_cols + 1 * (len(group_scores) % n_cols > 0))
         fig = plt.figure(figsize=((n_cols + 1) * 5, n_rows * 5))
@@ -172,17 +195,22 @@ def boxplot_scores_per_best_config(
             )
             max_results_df = (
                 results_df.loc[max_ids]
-                .filter(regex=f"(split[0-9]+_test_{score}|algo_name|results_tag)")
+                .filter(
+                    regex=f"(split[0-9]+_test_{score if static_score is None else static_score}"
+                    + "|algo_name|results_tag)"
+                )
                 .melt(id_vars=["algo_name", "results_tag"])
             )
-
+            y = (
+                -1 * max_results_df.loc[:, "value"]
+                if static_score is None and score == "davies_bouldin"
+                else "value"
+            )
             ax = fig.add_subplot(n_rows, n_cols, n + 1)
             sns.boxplot(
                 data=max_results_df,
                 x="algo_name",
-                y=-1 * max_results_df.loc[:, "value"]
-                if score == "davies_bouldin"
-                else "value",
+                y=y,
                 hue="results_tag"
                 if max_results_df.loc[:, "results_tag"].unique().shape[0] > 1
                 else None,
@@ -203,15 +231,20 @@ def boxplot_scores_per_best_config(
                     line.set_mec(face_col)  # edgecolor of fliers
 
             ax.set_title(
-                ("-1 * " if score == "davies_bouldin" else "")
-                + SCORES_PRETTY_NAMES[score]
+                (
+                    ("-1 * " if score == "davies_bouldin" else "")
+                    + SCORES_PRETTY_NAMES[score]
+                )
+                if static_score is None
+                else SCORES_PRETTY_NAMES[static_score]
             )
             ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha="right")
             ax.set_xlabel("")
             ax.legend([], [], frameon=False)
-        fig.suptitle(
-            f"Results for best hyperparameters for each{' ' + group_name if group_name != '' else ''} score"
-        )
+        if printable_group_name is not None:
+            fig.suptitle(
+                f"Results for best hyperparameters for each{printable_group_name}score"
+            )
         plt.legend(
             loc="lower left",
             bbox_to_anchor=(1.05, 0.4),
@@ -329,7 +362,8 @@ def main(
     datasets: list[str],
     skip_embedding: bool = False,
     latex_float_precision: int = 3,
-    split_score_groups: bool = False,
+    score_groups: str = "none",
+    skip_table: bool = False,
 ) -> None:
     for dataset in datasets:
         results_dfs = []
@@ -347,22 +381,33 @@ def main(
         output_dir = joined_results_dir(results_dirs)
         output_dir.mkdir(exist_ok=True)
 
-        best_results_table = get_best_results_table(results_df)
-        best_results_table.to_csv(output_dir / f"{dataset}_best_results_table.csv")
-        best_results_table.style.format(precision=latex_float_precision).to_latex(
-            output_dir / f"{dataset}_best_results_table.tex"
-        )
+        if not skip_table:
+            best_results_table = get_best_results_table(results_df)
+            best_results_table.to_csv(output_dir / f"{dataset}_best_results_table.csv")
+            best_results_table.style.format(precision=latex_float_precision).to_latex(
+                output_dir / f"{dataset}_best_results_table.tex"
+            )
 
         boxplot_mean_scores_per_algo(
             results_df,
             output_dir / f"{dataset}_mean_score_per.png",
-            split_score_groups,
+            score_groups,
+            additional_score_groups=[
+                (CLUSTERS_COUNT_STR, (None, [CLUSTERS_COUNT_STR]))
+            ],
         )
 
         boxplot_scores_per_best_config(
             results_df,
             output_dir / f"{dataset}_best_config_scores.png",
-            split_score_groups,
+            score_groups,
+        )
+
+        boxplot_scores_per_best_config(
+            results_df,
+            output_dir / f"{dataset}_best_config_scores.png",
+            score_groups,
+            static_score=CLUSTERS_COUNT_STR,
         )
 
         if not skip_embedding and len(results_dirs) == 1:
@@ -432,6 +477,9 @@ if __name__ == "__main__":
     )
     argparser.add_argument("--skip_embedding", default=False, action="store_true")
     argparser.add_argument("--latex_float_precision", default=3)
-    argparser.add_argument("--split_score_groups", default=False, action="store_true")
+    argparser.add_argument(
+        "--score_groups", default="", choices=["", "ground-truth", "individual"]
+    )
+    argparser.add_argument("--skip_table", default=False, action="store_true")
     kwargs = dict(argparser.parse_args()._get_kwargs())
     main(**kwargs)
