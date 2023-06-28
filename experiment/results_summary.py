@@ -424,6 +424,10 @@ def embedding_plot_per_best_config(
             plt.title(
                 f"Embedding visualization for best hyperparameters for {SCORES_PRETTY_NAMES[score]} for {algo_name}"
             )
+            plt.legend(
+                loc="lower left",
+                bbox_to_anchor=(1.05, 0.4),
+            )
             plt.tight_layout()
             plt.savefig(
                 score_dir
@@ -438,8 +442,12 @@ def embedding_plot_per_best_config(
             hue=ground_truth.map(str),
         )
         plt.title("Ground truth")
+        plt.legend(
+            loc="lower left",
+            bbox_to_anchor=(1.05, 0.4),
+        )
         plt.tight_layout()
-        plt.savefig(score_dir / f"Embedding_best_hyperparameters_ground_truth.png")
+        plt.savefig(save_dir / f"Embedding_best_hyperparameters_ground_truth.png")
         plt.close()
 
 
