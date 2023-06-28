@@ -1,13 +1,13 @@
 from argparse import ArgumentParser
 from pathlib import Path
-from typing import Optional
+from typing import Callable, Optional
 
 import matplotlib.pyplot as plt
-from matplotlib.patches import PathPatch
-from matplotlib.legend import _get_legend_handles_labels
 import numpy as np
 import pandas as pd
 import seaborn as sns
+from matplotlib.legend import _get_legend_handles_labels
+from matplotlib.patches import PathPatch
 from sklearn.cluster import (
     DBSCAN,
     OPTICS,
@@ -21,21 +21,22 @@ from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 from sklearn.mixture import GaussianMixture
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import QuantileTransformer, StandardScaler
+from sklearn.preprocessing import MinMaxScaler, QuantileTransformer, StandardScaler
 from sklearn_extra.cluster import KMedoids
 from sklearn_som.som import SOM
 from tqdm.auto import tqdm
 from umap.umap_ import UMAP
 from utils import (
     SEED,
+    get_pipeline_from_params,
     load_gemler_data_normed,
     load_metabric_data_normed,
-    get_pipeline_from_params,
 )
 
-DATASETS = {
-    "GEMLER": load_gemler_data_normed(),
-    "METABRIC": load_metabric_data_normed(),
+SCALERS = {
+    "min-max": MinMaxScaler,
+    "standard": StandardScaler,
+    "quantile": QuantileTransformer,
 }
 
 CLUSTERS_COUNT_STR = "clusters_count"
@@ -76,17 +77,30 @@ SCORES_PRETTY_NAMES = {
     CLUSTERS_COUNT_STR: "clusters count",
 }
 
+ALGO_PRETTY_NAMES = {
+    "KMeans": "K-Means",
+    "KMedoids": "K-Medoids",
+    "AffinityPropagation": "Affinity Propagation",
+    "AgglomerativeClustering": "AHC",
+    "Birch": "Birch",
+    "GaussianMixture": "Gaussian Mixture",
+    "DBSCAN": "DBSCAN",
+    "OPTICS": "OPTICS",
+    "SOM": "SOM",
+    "SpectralClustering": "Spectral Clustering",
+}
+
 ALGO_GROUPS = {
-    "KMeans": "Partition-based",
-    "KMedoids": "Partition-based",
-    "AffinityPropagation": "Partition-based",
-    "AgglomerativeClustering": "Hierarchical",
+    "K-Means": "Partition-based",
+    "K-Medoids": "Partition-based",
+    "Affinity Propagation": "Partition-based",
+    "AHC": "Hierarchical",
     "Birch": "Hierarchical",
-    "GaussianMixture": "Distribution-based",
+    "Gaussian Mixture": "Distribution-based",
     "DBSCAN": "Density-based",
     "OPTICS": "Density-based",
     "SOM": "Model-based",
-    "SpectralClustering": "Graph-based",
+    "Spectral Clustering": "Graph-based",
 }
 
 ALGO_GROUPS_ORDER = [
@@ -106,6 +120,17 @@ RESULTS_NAMES_DICT = {
     "results_2023_05_24_1508_QuantileTransformer_WHOLE_DATA": "QuantileTransformer",
     "results_2023_05_24_2340_MinMaxScaler_WHOLE_DATA": "MinMaxScaler",
 }
+
+UMAP_EMBEDDING_FILE = Path("./umap_embedding.csv")
+TSNE_EMBEDDING_FILE = Path("./tsne_embedding.csv")
+PCA_EMBEDDING_FILE = Path("./pca_embedding.csv")
+
+
+def get_datasets_dict(scaler: str = "min-max") -> dict[str, Callable]:
+    return {
+        "GEMLER": load_gemler_data_normed(SCALERS[scaler]()),
+        "METABRIC": load_metabric_data_normed(SCALERS[scaler]()),
+    }
 
 
 def path_list_parse(arg: str, delim: str = ",") -> list[Path]:
@@ -170,6 +195,7 @@ def boxplot_mean_scores_per_algo(
             save_path.parent
             / f"{save_path.stem}{'_' + group_name if group_name != '' else ''}{save_path.suffix}"
         )
+        plt.close()
 
 
 def boxplot_scores_per_best_config(
@@ -177,6 +203,8 @@ def boxplot_scores_per_best_config(
     save_path: Path,
     score_groups_str: str = "none",
     static_score: Optional[str] = None,
+    log_scale: bool = False,
+    median_label: str = "none",
 ) -> None:
     scores_groups = SCORES_GROUPS[score_groups_str]
     for group_name, (printable_group_name, group_scores) in scores_groups.items():
@@ -204,10 +232,10 @@ def boxplot_scores_per_best_config(
             y = (
                 -1 * max_results_df.loc[:, "value"]
                 if static_score is None and score == "davies_bouldin"
-                else "value"
+                else max_results_df.loc[:, "value"]
             )
             ax = fig.add_subplot(n_rows, n_cols, n + 1)
-            sns.boxplot(
+            box_plot = sns.boxplot(
                 data=max_results_df,
                 x="algo_name",
                 y=y,
@@ -218,6 +246,32 @@ def boxplot_scores_per_best_config(
                 ax=ax,
                 saturation=1,
             )
+            if median_label != "none":
+                medians = y.groupby(max_results_df.loc[:, "algo_name"]).median()
+                y_median = y.median()
+                vertical_offset = y_median * 0.1
+                for xtick, xlabel_text in zip(
+                    box_plot.get_xticks(), ax.get_xticklabels()
+                ):
+                    xlabel = xlabel_text.get_text()
+                    box_plot.text(
+                        xtick,
+                        medians.loc[xlabel]
+                        + (
+                            vertical_offset
+                            if medians.loc[xlabel] < y_median
+                            else -2 * vertical_offset
+                        ),
+                        f"{medians.loc[xlabel]:.3f}"
+                        if median_label == "float"
+                        else f"{int(medians.loc[xlabel])}",
+                        horizontalalignment="center",
+                        size="small",
+                        color="k",
+                        weight="semibold",
+                    )
+            if log_scale:
+                ax.set_yscale("log")
             box_patches = [patch for patch in ax.patches if type(patch) == PathPatch]
             lines_per_boxplot = len(ax.lines) // len(box_patches)
             for i, patch in enumerate(box_patches):
@@ -254,9 +308,12 @@ def boxplot_scores_per_best_config(
             save_path.parent
             / f"{save_path.stem}{'_' + group_name if group_name != '' else ''}{save_path.suffix}"
         )
+        plt.close()
 
 
-def get_best_results_table(results_df: pd.DataFrame) -> pd.DataFrame:
+def get_best_results_table(
+    results_df: pd.DataFrame, static_score: Optional[str] = None
+) -> pd.DataFrame:
     best_results_table = pd.DataFrame()
     for score, transform_func in SCORES.items():
         max_ids = (
@@ -265,12 +322,22 @@ def get_best_results_table(results_df: pd.DataFrame) -> pd.DataFrame:
             )
             == results_df.loc[:, f"mean_test_{score}"]
         )
-        max_results_df = (
-            results_df.loc[max_ids, ["algo_name", f"mean_test_{score}"]]
-            .drop_duplicates()
-            .set_index("algo_name")
+        max_results = (
+            (
+                results_df.loc[
+                    max_ids,
+                    [
+                        "algo_name",
+                        f"mean_test_{score if static_score is None else static_score}",
+                    ],
+                ]
+                .drop_duplicates()
+                .set_index("algo_name")
+            )
+            .loc[:, f"mean_test_{score if static_score is None else static_score}"]
+            .rename(score)
         )
-        best_results_table = pd.concat([best_results_table, max_results_df], axis=1)
+        best_results_table = pd.concat([best_results_table, max_results], axis=1)
     best_results_table.columns = best_results_table.columns.map(SCORES_PRETTY_NAMES)
     best_results_table = pd.concat(
         [
@@ -321,36 +388,35 @@ def embedding_plot_per_best_config(
     save_dir: Path,
 ) -> None:
     for score, labels_per_algo in tqdm(labels_per_score_per_algo.items()):
-        n_cols = 3
-        n_plots = len(labels_per_algo) + 1 * (ground_truth is not None)
-        n_rows = int(n_plots // n_cols + 1 * (n_plots % n_cols > 0))
-        fig = plt.figure(figsize=(n_rows * 20, n_cols * 5))
-
-        for n, (algo_name, labels) in enumerate(labels_per_algo.items()):
-            ax = fig.add_subplot(n_rows, n_cols, n + 1)
+        score_dir = save_dir / score
+        score_dir.mkdir(exist_ok=True)
+        for algo_name, labels in labels_per_algo.items():
             sns.scatterplot(
                 data=embedding,
                 x="x",
                 y="y",
                 hue=labels,
-                ax=ax,
             )
-            ax.set_title(algo_name)
-        if ground_truth is not None:
-            ax = fig.add_subplot(n_rows, n_cols, n + 2)
-            sns.scatterplot(
-                data=embedding,
-                x="x",
-                y="y",
-                hue=ground_truth.map(str),
-                ax=ax,
+            plt.title(
+                f"Embedding visualization for best hyperparameters for {SCORES_PRETTY_NAMES[score]} for {algo_name}"
             )
-            ax.set_title("Ground truth")
-        fig.suptitle(
-            f"Embedding visualization for best hyperparameters for {SCORES_PRETTY_NAMES[score]}"
+            plt.tight_layout()
+            plt.savefig(
+                score_dir
+                / f"Embedding_best_hyperparameters_{score}_{algo_name.replace(' ', '_')}.png"
+            )
+            plt.close()
+    if ground_truth is not None:
+        sns.scatterplot(
+            data=embedding,
+            x="x",
+            y="y",
+            hue=ground_truth.map(str),
         )
+        plt.title("Ground truth")
         plt.tight_layout()
-        fig.savefig(save_dir / f"Embedding_best_hyperparameters_{score}.png")
+        plt.savefig(score_dir / f"Embedding_best_hyperparameters_ground_truth.png")
+        plt.close()
 
 
 def joined_results_dir(results_dirs: list[Path]):
@@ -362,9 +428,12 @@ def main(
     datasets: list[str],
     skip_embedding: bool = False,
     latex_float_precision: int = 3,
+    latex_cluster_count_precision: int = 1,
     score_groups: str = "none",
     skip_table: bool = False,
+    scaler: str = "min-max",
 ) -> None:
+    datasets_dict = get_datasets_dict(scaler)
     for dataset in datasets:
         results_dfs = []
         for i, results_dir in enumerate(results_dirs):
@@ -377,6 +446,7 @@ def main(
                 results_dir.name, results_dir.name
             )
         results_df = pd.concat(results_dfs)
+        results_df.algo_name = results_df.algo_name.map(ALGO_PRETTY_NAMES)
 
         output_dir = joined_results_dir(results_dirs)
         output_dir.mkdir(exist_ok=True)
@@ -386,6 +456,19 @@ def main(
             best_results_table.to_csv(output_dir / f"{dataset}_best_results_table.csv")
             best_results_table.style.format(precision=latex_float_precision).to_latex(
                 output_dir / f"{dataset}_best_results_table.tex"
+            )
+
+            best_results_counts_table = get_best_results_table(
+                results_df, static_score=CLUSTERS_COUNT_STR
+            )
+            best_results_counts_table.columns = best_results_table.columns
+            best_results_counts_table.to_csv(
+                output_dir / f"{dataset}_best_results_{CLUSTERS_COUNT_STR}_table.csv"
+            )
+            best_results_counts_table.style.format(
+                precision=latex_cluster_count_precision,
+            ).to_latex(
+                output_dir / f"{dataset}_best_results_{CLUSTERS_COUNT_STR}_table.tex"
             )
 
         boxplot_mean_scores_per_algo(
@@ -408,23 +491,31 @@ def main(
             output_dir / f"{dataset}_best_config_scores_{CLUSTERS_COUNT_STR}.png",
             score_groups,
             static_score=CLUSTERS_COUNT_STR,
+            median_label="int",
         )
 
         if not skip_embedding and len(results_dirs) == 1:
-            data_df, ground_truth = DATASETS[dataset]()
+            data_df, ground_truth = datasets_dict[dataset]()
 
             labels_per_score_per_algo = get_best_labels_per_score_per_algo(
                 results_df,
                 data_df,
             )
 
-            embedding = pd.DataFrame(
-                TSNE(
-                    n_components=2, random_state=SEED, perplexity=30, metric="manhattan"
-                ).fit_transform(data_df),
-                index=data_df.index,
-                columns=["x", "y"],
-            )
+            if TSNE_EMBEDDING_FILE.exists():
+                embedding = pd.read_csv(TSNE_EMBEDDING_FILE, index_col=0)
+            else:
+                embedding = pd.DataFrame(
+                    TSNE(
+                        n_components=2,
+                        random_state=SEED,
+                        perplexity=30,
+                        metric="manhattan",
+                    ).fit_transform(data_df),
+                    index=data_df.index,
+                    columns=["x", "y"],
+                )
+                embedding.to_csv(TSNE_EMBEDDING_FILE)
 
             tsne_dir = results_dir / f"{dataset}_tsne"
             tsne_dir.mkdir(exist_ok=True)
@@ -436,11 +527,15 @@ def main(
                 tsne_dir,
             )
 
-            embedding = pd.DataFrame(
-                PCA(n_components=2, random_state=SEED).fit_transform(data_df),
-                index=data_df.index,
-                columns=["x", "y"],
-            )
+            if PCA_EMBEDDING_FILE.exists():
+                embedding = pd.read_csv(PCA_EMBEDDING_FILE, index_col=0)
+            else:
+                embedding = pd.DataFrame(
+                    PCA(n_components=2, random_state=SEED).fit_transform(data_df),
+                    index=data_df.index,
+                    columns=["x", "y"],
+                )
+                embedding.to_csv(PCA_EMBEDDING_FILE)
 
             pca_dir = results_dir / f"{dataset}_pca"
             pca_dir.mkdir(exist_ok=True)
@@ -452,11 +547,15 @@ def main(
                 pca_dir,
             )
 
-            embedding = pd.DataFrame(
-                UMAP(n_components=2, random_state=SEED).fit_transform(data_df),
-                index=data_df.index,
-                columns=["x", "y"],
-            )
+            if UMAP_EMBEDDING_FILE.exists():
+                embedding = pd.read_csv(UMAP_EMBEDDING_FILE, index_col=0)
+            else:
+                embedding = pd.DataFrame(
+                    UMAP(n_components=2, random_state=SEED).fit_transform(data_df),
+                    index=data_df.index,
+                    columns=["x", "y"],
+                )
+                embedding.to_csv(UMAP_EMBEDDING_FILE)
 
             umap_dir = results_dir / f"{dataset}_umap"
             umap_dir.mkdir(exist_ok=True)
@@ -473,13 +572,19 @@ if __name__ == "__main__":
     argparser = ArgumentParser()
     argparser.add_argument("results_dirs", type=path_list_parse)
     argparser.add_argument(
-        "--datasets", type=lambda x: x.split(","), default=list(DATASETS.keys())
+        "--datasets",
+        type=lambda x: x.split(","),
+        default=list(get_datasets_dict().keys()),
     )
     argparser.add_argument("--skip_embedding", default=False, action="store_true")
     argparser.add_argument("--latex_float_precision", default=3)
+    argparser.add_argument("--latex_cluster_count_precision", default=1)
     argparser.add_argument(
         "--score_groups", default="", choices=["", "ground-truth", "individual"]
     )
     argparser.add_argument("--skip_table", default=False, action="store_true")
+    argparser.add_argument(
+        "--scaler", default="min-max", choices=["min-max", "standard", "quantile"]
+    )
     kwargs = dict(argparser.parse_args()._get_kwargs())
     main(**kwargs)

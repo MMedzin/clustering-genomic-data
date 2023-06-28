@@ -1,0 +1,11 @@
+,Algorithm,Silhouette Coeff.,Calinski-Harabasz Index,Davies-Bouldin Index,Adjusted Rand Index,Adjusted Mutual Info.
+Partition-based,K-Means,2.0,2.0,3.0,4.0,8.0
+Partition-based,K-Medoids,2.0,3.0,2.0,3.0,3.0
+Partition-based,Affinity Propagation,5.2,33.0,2086.0,15.8,33.0
+Hierarchical,AHC,2.0,2.0,2.0,4.0,3.0
+Hierarchical,Birch,2.0,2.0,2.0,14.0,14.0
+Distribution-based,Gaussian Mixture,2.0,5.0,6.0,7.0,7.0
+Density-based,DBSCAN,2.0,2.0,2.0,2.0,2.0
+Density-based,OPTICS,2.0,2.0,2.0,3.2,3.2
+Model-based,SOM,2.0,2.0,4.0,6.0,10.0
+Graph-based,Spectral Clustering,3.8,3.0,5.6,12.0,3.0
