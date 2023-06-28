@@ -134,9 +134,18 @@ RESULTS_NAMES_DICT = {
     "results_2023_05_24_2340_MinMaxScaler_WHOLE_DATA": "MinMaxScaler",
 }
 
-UMAP_EMBEDDING_FILE = Path("./umap_embedding.csv")
-TSNE_EMBEDDING_FILE = Path("./tsne_embedding.csv")
-PCA_EMBEDDING_FILE = Path("./pca_embedding.csv")
+UMAP_EMBEDDING_FILE = {
+    "GEMLER": Path("./GEMLER_umap_embedding.csv"),
+    "METABRIC": Path("./METABRIC_umap_embedding.csv"),
+}
+TSNE_EMBEDDING_FILE = {
+    "GEMLER": Path("./GEMLER_tsne_embedding.csv"),
+    "METABRIC": Path("./METABRIC_tsne_embedding.csv"),
+}
+PCA_EMBEDDING_FILE = {
+    "GEMLER": Path("./GEMLER_pca_embedding.csv"),
+    "METABRIC": Path("./METABRIC_pca_embedding.csv"),
+}
 
 
 def get_datasets_dict(scaler: str = "min-max") -> dict[str, Callable]:
@@ -415,15 +424,14 @@ def embedding_plot_per_best_config(
         score_dir = save_dir / score
         score_dir.mkdir(exist_ok=True)
         for algo_name, labels in labels_per_algo.items():
+            plt.figure(figsize=(10, 5))
             sns.scatterplot(
                 data=embedding,
                 x="x",
                 y="y",
                 hue=labels,
             )
-            plt.title(
-                f"Embedding visualization for best hyperparameters for {SCORES_PRETTY_NAMES[score]} for {algo_name}"
-            )
+            plt.title(f"Best {algo_name} clustering on {SCORES_PRETTY_NAMES[score]}")
             plt.legend(
                 loc="lower left",
                 bbox_to_anchor=(1.05, 0.4),
@@ -435,19 +443,20 @@ def embedding_plot_per_best_config(
             )
             plt.close()
     if ground_truth is not None:
+        plt.figure(figsize=(10, 5))
         sns.scatterplot(
             data=embedding,
             x="x",
             y="y",
             hue=ground_truth.map(str),
         )
-        plt.title("Ground truth")
+        plt.title("External labels")
         plt.legend(
             loc="lower left",
             bbox_to_anchor=(1.05, 0.4),
         )
         plt.tight_layout()
-        plt.savefig(save_dir / f"Embedding_best_hyperparameters_ground_truth.png")
+        plt.savefig(save_dir / f"Embedding_best_hyperparameters_external_label.png")
         plt.close()
 
 
@@ -483,48 +492,48 @@ def main(
         output_dir = joined_results_dir(results_dirs)
         output_dir.mkdir(exist_ok=True)
 
-        if not skip_table:
-            best_results_table = get_best_results_table(results_df)
-            best_results_table.to_csv(output_dir / f"{dataset}_best_results_table.csv")
-            best_results_table.style.format(precision=latex_float_precision).to_latex(
-                output_dir / f"{dataset}_best_results_table.tex"
-            )
+        # if not skip_table:
+        #     best_results_table = get_best_results_table(results_df)
+        #     best_results_table.to_csv(output_dir / f"{dataset}_best_results_table.csv")
+        #     best_results_table.style.format(precision=latex_float_precision).to_latex(
+        #         output_dir / f"{dataset}_best_results_table.tex"
+        #     )
 
-            best_results_counts_table = get_best_results_table(
-                results_df, static_score=CLUSTERS_COUNT_STR
-            )
-            best_results_counts_table.columns = best_results_table.columns
-            best_results_counts_table.to_csv(
-                output_dir / f"{dataset}_best_results_{CLUSTERS_COUNT_STR}_table.csv"
-            )
-            best_results_counts_table.style.format(
-                precision=latex_cluster_count_precision,
-            ).to_latex(
-                output_dir / f"{dataset}_best_results_{CLUSTERS_COUNT_STR}_table.tex"
-            )
+        #     best_results_counts_table = get_best_results_table(
+        #         results_df, static_score=CLUSTERS_COUNT_STR
+        #     )
+        #     best_results_counts_table.columns = best_results_table.columns
+        #     best_results_counts_table.to_csv(
+        #         output_dir / f"{dataset}_best_results_{CLUSTERS_COUNT_STR}_table.csv"
+        #     )
+        #     best_results_counts_table.style.format(
+        #         precision=latex_cluster_count_precision,
+        #     ).to_latex(
+        #         output_dir / f"{dataset}_best_results_{CLUSTERS_COUNT_STR}_table.tex"
+        #     )
 
-        boxplot_mean_scores_per_algo(
-            results_df,
-            output_dir / f"{dataset}_mean_score_per.png",
-            score_groups,
-            additional_score_groups=[
-                (CLUSTERS_COUNT_STR, (None, [CLUSTERS_COUNT_STR]))
-            ],
-        )
+        # boxplot_mean_scores_per_algo(
+        #     results_df,
+        #     output_dir / f"{dataset}_mean_score_per.png",
+        #     score_groups,
+        #     additional_score_groups=[
+        #         (CLUSTERS_COUNT_STR, (None, [CLUSTERS_COUNT_STR]))
+        #     ],
+        # )
 
-        boxplot_scores_per_best_config(
-            results_df,
-            output_dir / f"{dataset}_best_config_scores.png",
-            score_groups,
-        )
+        # boxplot_scores_per_best_config(
+        #     results_df,
+        #     output_dir / f"{dataset}_best_config_scores.png",
+        #     score_groups,
+        # )
 
-        boxplot_scores_per_best_config(
-            results_df,
-            output_dir / f"{dataset}_best_config_scores_{CLUSTERS_COUNT_STR}.png",
-            score_groups,
-            static_score=CLUSTERS_COUNT_STR,
-            median_label="int",
-        )
+        # boxplot_scores_per_best_config(
+        #     results_df,
+        #     output_dir / f"{dataset}_best_config_scores_{CLUSTERS_COUNT_STR}.png",
+        #     score_groups,
+        #     static_score=CLUSTERS_COUNT_STR,
+        #     median_label="int",
+        # )
 
         if not skip_embedding and len(results_dirs) == 1:
             data_df, ground_truth = datasets_dict[dataset]()
@@ -534,8 +543,8 @@ def main(
                 data_df,
             )
 
-            if TSNE_EMBEDDING_FILE.exists():
-                embedding = pd.read_csv(TSNE_EMBEDDING_FILE, index_col=0)
+            if TSNE_EMBEDDING_FILE[dataset].exists():
+                embedding = pd.read_csv(TSNE_EMBEDDING_FILE[dataset], index_col=0)
             else:
                 embedding = pd.DataFrame(
                     TSNE(
@@ -547,7 +556,7 @@ def main(
                     index=data_df.index,
                     columns=["x", "y"],
                 )
-                embedding.to_csv(TSNE_EMBEDDING_FILE)
+                embedding.to_csv(TSNE_EMBEDDING_FILE[dataset])
 
             tsne_dir = results_dir / f"{dataset}_tsne"
             tsne_dir.mkdir(exist_ok=True)
@@ -559,45 +568,45 @@ def main(
                 tsne_dir,
             )
 
-            if PCA_EMBEDDING_FILE.exists():
-                embedding = pd.read_csv(PCA_EMBEDDING_FILE, index_col=0)
-            else:
-                embedding = pd.DataFrame(
-                    PCA(n_components=2, random_state=SEED).fit_transform(data_df),
-                    index=data_df.index,
-                    columns=["x", "y"],
-                )
-                embedding.to_csv(PCA_EMBEDDING_FILE)
+            # if PCA_EMBEDDING_FILE[dataset].exists():
+            #     embedding = pd.read_csv(PCA_EMBEDDING_FILE[dataset], index_col=0)
+            # else:
+            #     embedding = pd.DataFrame(
+            #         PCA(n_components=2, random_state=SEED).fit_transform(data_df),
+            #         index=data_df.index,
+            #         columns=["x", "y"],
+            #     )
+            #     embedding.to_csv(PCA_EMBEDDING_FILE[dataset])
 
-            pca_dir = results_dir / f"{dataset}_pca"
-            pca_dir.mkdir(exist_ok=True)
+            # pca_dir = results_dir / f"{dataset}_pca"
+            # pca_dir.mkdir(exist_ok=True)
 
-            embedding_plot_per_best_config(
-                labels_per_score_per_algo,
-                embedding,
-                ground_truth,
-                pca_dir,
-            )
+            # embedding_plot_per_best_config(
+            #     labels_per_score_per_algo,
+            #     embedding,
+            #     ground_truth,
+            #     pca_dir,
+            # )
 
-            if UMAP_EMBEDDING_FILE.exists():
-                embedding = pd.read_csv(UMAP_EMBEDDING_FILE, index_col=0)
-            else:
-                embedding = pd.DataFrame(
-                    UMAP(n_components=2, random_state=SEED).fit_transform(data_df),
-                    index=data_df.index,
-                    columns=["x", "y"],
-                )
-                embedding.to_csv(UMAP_EMBEDDING_FILE)
+            # if UMAP_EMBEDDING_FILE[dataset].exists():
+            #     embedding = pd.read_csv(UMAP_EMBEDDING_FILE[dataset], index_col=0)
+            # else:
+            #     embedding = pd.DataFrame(
+            #         UMAP(n_components=2, random_state=SEED).fit_transform(data_df),
+            #         index=data_df.index,
+            #         columns=["x", "y"],
+            #     )
+            #     embedding.to_csv(UMAP_EMBEDDING_FILE[dataset])
 
-            umap_dir = results_dir / f"{dataset}_umap"
-            umap_dir.mkdir(exist_ok=True)
+            # umap_dir = results_dir / f"{dataset}_umap"
+            # umap_dir.mkdir(exist_ok=True)
 
-            embedding_plot_per_best_config(
-                labels_per_score_per_algo,
-                embedding,
-                ground_truth,
-                umap_dir,
-            )
+            # embedding_plot_per_best_config(
+            #     labels_per_score_per_algo,
+            #     embedding,
+            #     ground_truth,
+            #     umap_dir,
+            # )
 
 
 if __name__ == "__main__":
