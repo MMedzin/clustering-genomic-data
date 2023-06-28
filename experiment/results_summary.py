@@ -103,6 +103,19 @@ ALGO_GROUPS = {
     "Spectral Clustering": "Graph-based",
 }
 
+ALGO_ORDER = [
+    "K-Means",
+    "K-Medoids",
+    "Affinity Propagation",
+    "AHC",
+    "Birch",
+    "Gaussian Mixture",
+    "DBSCAN",
+    "OPTICS",
+    "SOM",
+    "Spectral Clustering",
+]
+
 ALGO_GROUPS_ORDER = [
     "Partition-based",
     "Hierarchical",
@@ -165,6 +178,7 @@ def boxplot_mean_scores_per_algo(
                 if results_df.loc[:, "results_tag"].unique().shape[0] > 1
                 else None,
                 ax=ax,
+                order=ALGO_ORDER,
             )
             ax.set_title(
                 ("-1 * " if score == "davies_bouldin" else "")
@@ -184,6 +198,10 @@ def boxplot_mean_scores_per_algo(
                     line.set_mec(face_col)  # edgecolor of fliers
             ax.legend([], [], frameon=False)
             ax.set_xlabel("")
+            if score in ["silhouette", "adjusted_rand_index"]:
+                ax.hlines(
+                    [0], *ax.get_xlim(), linestyles="dashed", colors="gray", alpha=0.5
+                )
 
         if printable_group_name is not None:
             fig.suptitle(
@@ -245,6 +263,7 @@ def boxplot_scores_per_best_config(
                 palette=PALETTE,
                 ax=ax,
                 saturation=1,
+                order=ALGO_ORDER,
             )
             if median_label != "none":
                 medians = y.groupby(max_results_df.loc[:, "algo_name"]).median()
@@ -295,6 +314,11 @@ def boxplot_scores_per_best_config(
             ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha="right")
             ax.set_xlabel("")
             ax.legend([], [], frameon=False)
+            if score in ["silhouette", "adjusted_rand_index"]:
+                ax.hlines(
+                    [0], *ax.get_xlim(), linestyles="dashed", colors="gray", alpha=0.5
+                )
+
         if printable_group_name is not None:
             fig.suptitle(
                 f"Results for best hyperparameters for each{printable_group_name}score"
