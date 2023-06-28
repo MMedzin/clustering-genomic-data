@@ -82,7 +82,7 @@ ALGO_PRETTY_NAMES = {
     "KMedoids": "K-Medoids",
     "AffinityPropagation": "Affinity Propagation",
     "AgglomerativeClustering": "AHC",
-    "Birch": "Birch",
+    "Birch": "BIRCH",
     "GaussianMixture": "Gaussian Mixture",
     "DBSCAN": "DBSCAN",
     "OPTICS": "OPTICS",
@@ -95,7 +95,7 @@ ALGO_GROUPS = {
     "K-Medoids": "Partition-based",
     "Affinity Propagation": "Partition-based",
     "AHC": "Hierarchical",
-    "Birch": "Hierarchical",
+    "BIRCH": "Hierarchical",
     "Gaussian Mixture": "Distribution-based",
     "DBSCAN": "Density-based",
     "OPTICS": "Density-based",
@@ -108,7 +108,7 @@ ALGO_ORDER = [
     "K-Medoids",
     "Affinity Propagation",
     "AHC",
-    "Birch",
+    "BIRCH",
     "Gaussian Mixture",
     "DBSCAN",
     "OPTICS",
@@ -492,48 +492,48 @@ def main(
         output_dir = joined_results_dir(results_dirs)
         output_dir.mkdir(exist_ok=True)
 
-        # if not skip_table:
-        #     best_results_table = get_best_results_table(results_df)
-        #     best_results_table.to_csv(output_dir / f"{dataset}_best_results_table.csv")
-        #     best_results_table.style.format(precision=latex_float_precision).to_latex(
-        #         output_dir / f"{dataset}_best_results_table.tex"
-        #     )
+        if not skip_table:
+            best_results_table = get_best_results_table(results_df)
+            best_results_table.to_csv(output_dir / f"{dataset}_best_results_table.csv")
+            best_results_table.style.format(precision=latex_float_precision).to_latex(
+                output_dir / f"{dataset}_best_results_table.tex"
+            )
 
-        #     best_results_counts_table = get_best_results_table(
-        #         results_df, static_score=CLUSTERS_COUNT_STR
-        #     )
-        #     best_results_counts_table.columns = best_results_table.columns
-        #     best_results_counts_table.to_csv(
-        #         output_dir / f"{dataset}_best_results_{CLUSTERS_COUNT_STR}_table.csv"
-        #     )
-        #     best_results_counts_table.style.format(
-        #         precision=latex_cluster_count_precision,
-        #     ).to_latex(
-        #         output_dir / f"{dataset}_best_results_{CLUSTERS_COUNT_STR}_table.tex"
-        #     )
+            best_results_counts_table = get_best_results_table(
+                results_df, static_score=CLUSTERS_COUNT_STR
+            )
+            best_results_counts_table.columns = best_results_table.columns
+            best_results_counts_table.to_csv(
+                output_dir / f"{dataset}_best_results_{CLUSTERS_COUNT_STR}_table.csv"
+            )
+            best_results_counts_table.style.format(
+                precision=latex_cluster_count_precision,
+            ).to_latex(
+                output_dir / f"{dataset}_best_results_{CLUSTERS_COUNT_STR}_table.tex"
+            )
 
-        # boxplot_mean_scores_per_algo(
-        #     results_df,
-        #     output_dir / f"{dataset}_mean_score_per.png",
-        #     score_groups,
-        #     additional_score_groups=[
-        #         (CLUSTERS_COUNT_STR, (None, [CLUSTERS_COUNT_STR]))
-        #     ],
-        # )
+        boxplot_mean_scores_per_algo(
+            results_df,
+            output_dir / f"{dataset}_mean_score_per.png",
+            score_groups,
+            additional_score_groups=[
+                (CLUSTERS_COUNT_STR, (None, [CLUSTERS_COUNT_STR]))
+            ],
+        )
 
-        # boxplot_scores_per_best_config(
-        #     results_df,
-        #     output_dir / f"{dataset}_best_config_scores.png",
-        #     score_groups,
-        # )
+        boxplot_scores_per_best_config(
+            results_df,
+            output_dir / f"{dataset}_best_config_scores.png",
+            score_groups,
+        )
 
-        # boxplot_scores_per_best_config(
-        #     results_df,
-        #     output_dir / f"{dataset}_best_config_scores_{CLUSTERS_COUNT_STR}.png",
-        #     score_groups,
-        #     static_score=CLUSTERS_COUNT_STR,
-        #     median_label="int",
-        # )
+        boxplot_scores_per_best_config(
+            results_df,
+            output_dir / f"{dataset}_best_config_scores_{CLUSTERS_COUNT_STR}.png",
+            score_groups,
+            static_score=CLUSTERS_COUNT_STR,
+            median_label="int",
+        )
 
         if not skip_embedding and len(results_dirs) == 1:
             data_df, ground_truth = datasets_dict[dataset]()
@@ -568,45 +568,45 @@ def main(
                 tsne_dir,
             )
 
-            # if PCA_EMBEDDING_FILE[dataset].exists():
-            #     embedding = pd.read_csv(PCA_EMBEDDING_FILE[dataset], index_col=0)
-            # else:
-            #     embedding = pd.DataFrame(
-            #         PCA(n_components=2, random_state=SEED).fit_transform(data_df),
-            #         index=data_df.index,
-            #         columns=["x", "y"],
-            #     )
-            #     embedding.to_csv(PCA_EMBEDDING_FILE[dataset])
+            if PCA_EMBEDDING_FILE[dataset].exists():
+                embedding = pd.read_csv(PCA_EMBEDDING_FILE[dataset], index_col=0)
+            else:
+                embedding = pd.DataFrame(
+                    PCA(n_components=2, random_state=SEED).fit_transform(data_df),
+                    index=data_df.index,
+                    columns=["x", "y"],
+                )
+                embedding.to_csv(PCA_EMBEDDING_FILE[dataset])
 
-            # pca_dir = results_dir / f"{dataset}_pca"
-            # pca_dir.mkdir(exist_ok=True)
+            pca_dir = results_dir / f"{dataset}_pca"
+            pca_dir.mkdir(exist_ok=True)
 
-            # embedding_plot_per_best_config(
-            #     labels_per_score_per_algo,
-            #     embedding,
-            #     ground_truth,
-            #     pca_dir,
-            # )
+            embedding_plot_per_best_config(
+                labels_per_score_per_algo,
+                embedding,
+                ground_truth,
+                pca_dir,
+            )
 
-            # if UMAP_EMBEDDING_FILE[dataset].exists():
-            #     embedding = pd.read_csv(UMAP_EMBEDDING_FILE[dataset], index_col=0)
-            # else:
-            #     embedding = pd.DataFrame(
-            #         UMAP(n_components=2, random_state=SEED).fit_transform(data_df),
-            #         index=data_df.index,
-            #         columns=["x", "y"],
-            #     )
-            #     embedding.to_csv(UMAP_EMBEDDING_FILE[dataset])
+            if UMAP_EMBEDDING_FILE[dataset].exists():
+                embedding = pd.read_csv(UMAP_EMBEDDING_FILE[dataset], index_col=0)
+            else:
+                embedding = pd.DataFrame(
+                    UMAP(n_components=2, random_state=SEED).fit_transform(data_df),
+                    index=data_df.index,
+                    columns=["x", "y"],
+                )
+                embedding.to_csv(UMAP_EMBEDDING_FILE[dataset])
 
-            # umap_dir = results_dir / f"{dataset}_umap"
-            # umap_dir.mkdir(exist_ok=True)
+            umap_dir = results_dir / f"{dataset}_umap"
+            umap_dir.mkdir(exist_ok=True)
 
-            # embedding_plot_per_best_config(
-            #     labels_per_score_per_algo,
-            #     embedding,
-            #     ground_truth,
-            #     umap_dir,
-            # )
+            embedding_plot_per_best_config(
+                labels_per_score_per_algo,
+                embedding,
+                ground_truth,
+                umap_dir,
+            )
 
 
 if __name__ == "__main__":
