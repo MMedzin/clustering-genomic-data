@@ -1,4 +1,4 @@
-from argparse import ArgumentParser
+from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 from pathlib import Path
 from typing import Callable, Optional
 
@@ -28,16 +28,9 @@ from tqdm.auto import tqdm
 from umap.umap_ import UMAP
 from utils import (
     SEED,
+    get_datasets_dict,
     get_pipeline_from_params,
-    load_gemler_data_normed,
-    load_metabric_data_normed,
 )
-
-SCALERS = {
-    "min-max": MinMaxScaler,
-    "standard": StandardScaler,
-    "quantile": QuantileTransformer,
-}
 
 CLUSTERS_COUNT_STR = "clusters_count"
 
@@ -146,13 +139,6 @@ PCA_EMBEDDING_FILE = {
     "GEMLER": Path("./GEMLER_pca_embedding.csv"),
     "METABRIC": Path("./METABRIC_pca_embedding.csv"),
 }
-
-
-def get_datasets_dict(scaler: str = "min-max") -> dict[str, Callable]:
-    return {
-        "GEMLER": load_gemler_data_normed(SCALERS[scaler]()),
-        "METABRIC": load_metabric_data_normed(SCALERS[scaler]()),
-    }
 
 
 def path_list_parse(arg: str, delim: str = ",") -> list[Path]:
@@ -610,22 +596,51 @@ def main(
 
 
 if __name__ == "__main__":
-    argparser = ArgumentParser()
-    argparser.add_argument("results_dirs", type=path_list_parse)
+    argparser = ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter)
+    argparser.add_argument(
+        "results_dirs",
+        type=path_list_parse,
+        help="path(s) to directories with results, separated be coma (',')",
+    )
     argparser.add_argument(
         "--datasets",
         type=lambda x: x.split(","),
         default=list(get_datasets_dict().keys()),
+        help="names of datasets for which results are processed, separated be coma (',')",
     )
-    argparser.add_argument("--skip_embedding", default=False, action="store_true")
-    argparser.add_argument("--latex_float_precision", default=3)
-    argparser.add_argument("--latex_cluster_count_precision", default=1)
     argparser.add_argument(
-        "--score_groups", default="", choices=["", "ground-truth", "individual"]
+        "--skip_embedding",
+        default=False,
+        action="store_true",
+        help="flags if embedding plots should be skipped",
     )
-    argparser.add_argument("--skip_table", default=False, action="store_true")
     argparser.add_argument(
-        "--scaler", default="min-max", choices=["min-max", "standard", "quantile"]
+        "--latex_float_precision",
+        default=3,
+        help="precision level for floats (except cluster count means) in latex version of results table",
+    )
+    argparser.add_argument(
+        "--latex_cluster_count_precision",
+        default=1,
+        help="precision level for cluster counts means in latex version of results table",
+    )
+    argparser.add_argument(
+        "--score_groups",
+        default="",
+        choices=["", "ground-truth", "individual"],
+        help="method for grouping scores on plots",
+    )
+    argparser.add_argument(
+        "--skip_table",
+        default=False,
+        action="store_true",
+        help="flags if the results table creation should be skipped",
+    )
+    argparser.add_argument(
+        "--scaler",
+        default="min-max",
+        choices=["min-max", "none", "pca", "quantile", "standard"],
+        help="select scaler used for data preprocessing",
     )
     kwargs = dict(argparser.parse_args()._get_kwargs())
     main(**kwargs)

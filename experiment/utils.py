@@ -22,7 +22,12 @@ from sklearn.mixture import GaussianMixture
 from sklearn.model_selection import BaseCrossValidator
 from sklearn.neighbors import LocalOutlierFactor
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import FunctionTransformer, MinMaxScaler
+from sklearn.preprocessing import (
+    FunctionTransformer,
+    MinMaxScaler,
+    QuantileTransformer,
+    StandardScaler,
+)
 from sklearn_extra.cluster import KMedoids
 from sklearn_som.som import SOM
 
@@ -32,7 +37,6 @@ FILE_DIR = Path(__file__).parent
 DATASETS_PATH = FILE_DIR / "../datasets"
 
 SEED = 23
-
 
 # Data Loaders
 
@@ -52,6 +56,15 @@ def noop_func(
 
 
 NOOP_TRANSFORMER = FunctionTransformer(noop_func)
+
+
+SCALERS = {
+    "min-max": MinMaxScaler,
+    "none": NOOP_TRANSFORMER,
+    "pca": StandardScaler,
+    "quantile": QuantileTransformer,
+    "standard": StandardScaler,
+}
 
 
 def remove_outliers(
@@ -427,7 +440,6 @@ def load_gemler_pca_param_grid() -> list[dict]:
         0.0,
     ]
     PCA_COMPONENTS = 217
-    FEATURES_COUNT = 7888
 
     return build_param_grid(
         reduce_dim=[PCA(n_components=PCA_COMPONENTS)],
@@ -691,7 +703,6 @@ def load_metabric_pca_param_grid() -> list[dict]:
         0.0,
     ]
     PCA_COMPONENTS = 273
-    FEATURES_COUNT = 20000
 
     return build_param_grid(
         reduce_dim=[PCA(n_components=PCA_COMPONENTS)],
@@ -711,6 +722,43 @@ def load_metabric_pca_param_grid() -> list[dict]:
         features_count=PCA_COMPONENTS,
         skip_pca_only=False,
     )
+
+
+PARAM_GRIDS = {
+    "gemler": {
+        "min-max": load_gemler_minmax_param_grid,
+        "pca": load_gemler_pca_param_grid,
+        "quantile": load_gemler_quantile_param_grid,
+        "standard": load_gemler_standard_param_grid,
+    },
+    "metabric": {
+        "min-max": load_metabric_minmax_param_grid,
+        "pca": load_metabric_pca_param_grid,
+        "quantile": load_metabric_quantile_param_grid,
+        "standard": load_metabric_standard_param_grid,
+    },
+}
+
+
+def get_datasets_dict(
+    scaler: str = "min-max", include_param_grid: bool = False
+) -> dict[str, Callable]:
+    if include_param_grid:
+        return {
+            "GEMLER": (
+                load_gemler_data_normed(SCALERS[scaler]()),
+                PARAM_GRIDS["gemler"][scaler],
+            ),
+            "METABRIC": (
+                load_metabric_data_normed(SCALERS[scaler]()),
+                PARAM_GRIDS["metabric"][scaler],
+            ),
+        }
+    else:
+        return {
+            "GEMLER": load_gemler_data_normed(SCALERS[scaler]()),
+            "METABRIC": load_metabric_data_normed(SCALERS[scaler]()),
+        }
 
 
 # Scorer factories
