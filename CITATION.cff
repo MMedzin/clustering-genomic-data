@@ -1,0 +1,15 @@
+cff-version: 1.2.0
+message: "If you use this study, please cite it as below."
+authors:
+- family-names: "Mędzin"
+  given-names: "Michał"
+  github: "https://github.com/MMedzin"
+- family-names: "Brzeziński"
+  given-names: "Dariusz"
+  github: "https://github.com/dabrze"
+  orcid: "https://orcid.org/0000-0001-9723-525X"
+title: "CLUSTERING METHODS FOR GENOMIC DATA"
+version: 1.0.1
+doi: 10.5281/zenodo.8136372
+date-released: 2023-07-11
+url: "https://github.com/MMedzin/clustering-genomic-data"
