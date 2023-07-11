@@ -20,7 +20,7 @@ Dunning, Doug Speed, Andy G Lynch, Shamith Samarajiwa, Yinyin Yuan, et al. The g
 transcriptomic architecture of 2,000 breast tumours reveals novel subgroups. `_`Nature`_`, 486(7403):
 346–352, 2012`
 
-Instructions for downloading those datasets, and adding new datasets are explained in [datasets/README.md](./datasets/README.md)
+Instructions for downloading those datasets, and adding new datasets are explained in [datasets/README.md](./datasets/README.md).
 
 ### Clustering algorithms
 The study evaluated follwing clustering algorithms:
