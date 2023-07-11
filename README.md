@@ -1,30 +1,30 @@
-# CLustering algorithms on genomic data
-This is a repository with sourcode and results of experiments for my master's thesis: _CLUSTERING METHODS FOR GENOMIC DATA_. The purpose of the study was to evaluate popular clustering methods and quality measures on the genomic data. The results serve asa basic guidance for researchers looking to choose a best method for clustering on genomic data.
+# Clustering algorithms on genomic data
+This is a repository with source code and results of experiments for my master's thesis: _CLUSTERING METHODS FOR GENOMIC DATA_. The purpose of the study was to evaluate popular clustering methods and quality measures on the genomic data. The results serve as basic guidance for researchers looking to choose the best method for clustering on genomic data.
 
 ## Experimental setup
 
-### Dastasets
-In the study I have used two microarray datasets:
+### Datasets
+In the study, I have used two microarray datasets:
 * GEMLeR (Gene Expression Machine Learning Repository)
-    * dataset of gene expression levels in cancer cells from nine different tissues
+    * dataset of gene expression levels in cancer cells from nine different tissues,
     * 1488 samples, 7888 attributes (genes),
     * `Gregor Stiglic and Peter Kokol. Stability of ranked gene lists in large microarray analysis studies.
 `_`Journal of biomedicine and biotechnology`_`, 2010, 2010.`
 
 * METABRIC (The Molecular Taxonomy of Breast Cancer International
 Consortium)
-    * dataset of gene expression levels in cancer cells from six subtypes of the breast cancer,
+    * dataset of gene expression levels in cancer cells from six subtypes of breast cancer,
     * 2106 samples, 20000 attributes (genes),
     * `Christina Curtis, Sohrab P Shah, Suet-Feung Chin, Gulisa Turashvili, Oscar M Rueda, Mark J
 Dunning, Doug Speed, Andy G Lynch, Shamith Samarajiwa, Yinyin Yuan, et al. The genomic and
 transcriptomic architecture of 2,000 breast tumours reveals novel subgroups. `_`Nature`_`, 486(7403):
 346–352, 2012`
 
-Instructions for downloading those datasets, and adding new datasets are explained in [datasets/README.md](./datasets/README.md).
+Instructions for downloading the above datasets and adding new datasets are explained in [datasets/README.md](./datasets/README.md).
 
 ### Clustering algorithms
-The study evaluated follwing clustering algorithms:
-* partitining:
+The study evaluated the follwing clustering algorithms:
+* partitioning:
     * K-Means
     * K-Medoids
     * Affinity Propagation
@@ -53,33 +53,33 @@ The algorithms were evaluated using five measures:
 
 
 ### Preprocessing
-Additionally four methds of preprocessing were considered:
+Additionally, four methods of preprocessing were considered:
 * Z-score normalization ($\frac{x - \mu}{\sigma}$)
 * min-max normalization ($\frac{x - x_{min}}{x_{max} - x_{min}}$)
 * quantile normalization (transformation to form normal distribution from the data)
 * Z-score + PCA dimensionality reduction
 
 ## Environment configuration
-To run this experiments you need Python 3.9 environment. You can use the prepared docker container or your own environment, for example conda env.
+To run those experiments, you need Python 3.9 environment. You can use the prepared docker container or your own environment, for example, conda env.
 
-To build and run the docker container, you will need `docker-compose`, then you can simply use the following commands:
+To build and run the docker container, you will need `docker-compose`, then you can use the following commands:
 ```bash
 docker-compose build
 docker-compose run --rm env
 ```
-This will create a container with the ready environment (with python 3.9 and neccessary packages).
+This will create a container with the ready environment (Python 3.9 and necessary packages).
 
-If you would like to use the conda env instead, do:
+If you would like to use the conda env instead, do the following:
 ```bash
 conda create -n clustering-genomic-data python=3.9
 conda activate clustering-genomic-data
 pip install -r requirements.txt
 ```
-This will create a conda env with all neccessary packages.
+This will create a conda env with all necessary packages.
 
 ## Running experiments
 
-Experiments are run using python script `run_experiments.py`:
+Experiments are run using the Python script `run_experiments.py`:
 ```bash
 usage: run_experiment.py [-h] [--scaler {min-max,pca,quantile,standard}] [--results_dir_tag RESULTS_DIR_TAG] [--experiment_dir EXPERIMENT_DIR] [--repeats REPEATS] [--shuffle_each_repeat]
 
@@ -90,13 +90,13 @@ optional arguments:
   --results_dir_tag RESULTS_DIR_TAG
                         tag added as suffix to the results directory name (default: )
   --experiment_dir EXPERIMENT_DIR
-                        experiment directory, inside of which results directory will be created (default: /Users/michal/Documents/studia/mgr/praca magisterska/clustering-genomic-data/experiment)
+                        experiment directory, inside of which results directory will be created (default: ./experiment)
   --repeats REPEATS     number of repeats of the evaluation (default: 5)
   --shuffle_each_repeat
                         flags if the order of samples in the dataset should be shuffled in each repeat (default: False)
 ```
 
-To reproduce experiments from the study run following commands (in a proper environment):
+To reproduce experiments from the study, run the following commands (in a proper environment):
 ```bash
 cd experiment
 python run_experiment.py --scaler pca --results_dir_tag PCA --repeats 5 --shuffle_each_repeat
@@ -111,9 +111,9 @@ Python script `results_summary.py` processes the results. It creates:
 * a table with the mean results for the best configuration of each algorithm for each score,
 * a table with the mean cluster count for the best configuration of each algorithm for each score,
 * plots for mean results of best algorithms for each score,
-* plots for for the mean results of all configuration of each algorithm for each score,
+* plots for the mean results of all configurations of each algorithm for each score,
 * embedding plots (t-SNE, UMAP, PCA) with the clusterings of the best configuration of each algorithm for each score.
-The results from the study, and their summary is presented in [experiment/README.md](./experiment/README.md).
+The study's results and their summary are presented in [experiment/README.md](./experiment/README.md).
 
 Usage:
 ```bash
@@ -122,11 +122,11 @@ usage: results_summary.py [-h] [--datasets DATASETS] [--skip_embedding] [--latex
                           results_dirs
 
 positional arguments:
-  results_dirs          path(s) to directories with results, separated be coma (',')
+  results_dirs          path(s) to directories with results, separated by coma (',')
 
 optional arguments:
   -h, --help            show this help message and exit
-  --datasets DATASETS   names of datasets for which results are processed, separated be coma (',') (default: ['GEMLER', 'METABRIC'])
+  --datasets DATASETS   names of datasets for which results are processed, separated by coma (',') (default: ['GEMLER', 'METABRIC'])
   --skip_embedding      flags if embedding plots should be skipped (default: False)
   --latex_float_precision LATEX_FLOAT_PRECISION
                         precision level for floats (except cluster count means) in latex version of results table (default: 3)

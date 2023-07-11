@@ -1,6 +1,6 @@
 # Datasets
 
-Two datasets were used in this study - GEMLeR and METABRIC. Instructions how to get neccessary files are explained below.
+Two datasets were used in this study - GEMLeR and METABRIC. Instructions on how to get the necessary files are explained below.
 
 ## GEMLeR
 This dataset was sourced from [https://www.openml.org](https://www.openml.org). Five subsets of samples were used. They are stored in five separate `.arff` files and are available at:
@@ -12,7 +12,7 @@ This dataset was sourced from [https://www.openml.org](https://www.openml.org). 
 
 Those files are already loaded to this repository, as they are relatively small.
 
-Those datasets are merged to form one big dataset with 1488 samples and 7888 attributes (gene expression levels). Only genes common for all samples were left, to avoid missing values. The following table presents distribution of labels in the merged dataset:
+Those datasets are merged to form one big dataset with 1488 samples and 7888 attributes (gene expression levels). Only genes common for all samples were left to avoid missing values. The following table presents the distribution of labels in the merged dataset:
 | Tissue | Breast | Colon | Kidney | Ovary | Lung | Uterus | Omentum | Prostate | Endometrium |
 |--------|--------|-------|--------|-------|------|--------|---------|----------|-------------|
 | count  | 333    | 278   | 252    | 183   | 119  | 119    | 76      | 67       | 61          |
@@ -28,14 +28,14 @@ This dataset was sourced from the [DeepType](https://www.ncbi.nlm.nih.gov/pmc/ar
 |---------|-----|-----|-----|-----|-----|-----|
 | count   | 719 | 484 | 323 | 232 | 200 | 148 |
 
-## Adding new dataset
-To add a new dataset to the experiment you need to do the follwoing steps:
+## Adding a new dataset
+To add a new dataset to the experiment, you need to do the following steps:
 
 1. Create a loading function in `experiment/utils.py`, analogous to the `load_gemler_data_normed()`, and `load_metabric_data_normed()`.
 
-2. Create a param grids for all desired preprocessing types, analogous to the `load_gemler_minmax_param_grid()`, `load_gemler_standard_param_grid()`, etc.
+2. Create a param grid for all desired preprocessing types, analogous to the `load_gemler_minmax_param_grid()`, `load_gemler_standard_param_grid()`, etc.
 
-3. Add those paramgrids to the `PARAM_GRIDS` dictionary.
+3. Add those param grids to the `PARAM_GRIDS` dictionary.
 
 4. Add your dataset entry into the dictionary returned by the `get_datasets_dict()` function.
 

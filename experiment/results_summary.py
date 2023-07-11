@@ -600,13 +600,13 @@ if __name__ == "__main__":
     argparser.add_argument(
         "results_dirs",
         type=path_list_parse,
-        help="path(s) to directories with results, separated be coma (',')",
+        help="path(s) to directories with results, separated by coma (',')",
     )
     argparser.add_argument(
         "--datasets",
         type=lambda x: x.split(","),
         default=list(get_datasets_dict().keys()),
-        help="names of datasets for which results are processed, separated be coma (',')",
+        help="names of datasets for which results are processed, separated by coma (',')",
     )
     argparser.add_argument(
         "--skip_embedding",
