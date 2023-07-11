@@ -1,4 +1,6 @@
 # Clustering algorithms on genomic data
+[![DOI](https://zenodo.org/badge/{github_id}.svg)](https://zenodo.org/badge/latestdoi/{github_id})
+
 This is a repository with source code and results of experiments for my master's thesis: _CLUSTERING METHODS FOR GENOMIC DATA_. The purpose of the study was to evaluate popular clustering methods and quality measures on the genomic data. The results serve as basic guidance for researchers looking to choose the best method for clustering on genomic data.
 
 ## Experimental setup
