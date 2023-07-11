@@ -1,0 +1,10 @@
+version: "3.8"
+services:
+  env:
+    build: .
+    image: clustering-genomic-data:0.1
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./datasets:/clustering-genomic-data/datasets
+      - ./experiment:/clustering-genomic-data/experiment
