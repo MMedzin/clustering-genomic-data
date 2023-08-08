@@ -102,9 +102,9 @@ To reproduce experiments from the study, run the following commands (in a proper
 ```bash
 cd experiment
 python run_experiment.py --scaler pca --results_dir_tag PCA --repeats 5 --shuffle_each_repeat
-python run_experiment.py --scaler standard --results_dir_tag PCA --repeats 5 --shuffle_each_repeat
-python run_experiment.py --scaler quantile --results_dir_tag PCA --repeats 5 --shuffle_each_repeat
-python run_experiment.py --scaler min-max --results_dir_tag PCA --repeats 5 --shuffle_each_repeat
+python run_experiment.py --scaler standard --results_dir_tag StandardScaler --repeats 5 --shuffle_each_repeat
+python run_experiment.py --scaler quantile --results_dir_tag QuantileTransformer --repeats 5 --shuffle_each_repeat
+python run_experiment.py --scaler min-max --results_dir_tag MinMaxScaler --repeats 5 --shuffle_each_repeat
 ```
 
 ## Experiments summary
