@@ -38,6 +38,15 @@ DATASETS_PATH = FILE_DIR / "../datasets"
 
 SEED = 23
 
+METABRIC_LABELS_MAP = {
+    3: "Luminal A",
+    4: "Luminal B",
+    1: "Basal",
+    2: "HER2",
+    5: "Normal",
+    6: "Not classified",
+}
+
 # Data Loaders
 
 
@@ -116,7 +125,7 @@ def load_gemler_data_normed(
         data, ground_truth = remove_outliers(data, ground_truth, outliers_model)
         data = norm_data(data, scaler=scaler)
 
-        return data, ground_truth.map(lambda x: x.decode("utf-8"))
+        return data, ground_truth.map(lambda x: x.decode("utf-8")).rename("Tissue")
 
     return loader_func
 
@@ -478,7 +487,9 @@ def load_metabric_data_normed(
         data, ground_truth = remove_outliers(data, ground_truth, outliers_model)
         data = norm_data(data, scaler=scaler)
 
-        return data, ground_truth
+        ground_truth = ground_truth.map(METABRIC_LABELS_MAP)
+
+        return data, ground_truth.rename("Subtype")
 
     return loader_func
 
