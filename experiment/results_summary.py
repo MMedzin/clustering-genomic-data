@@ -410,22 +410,42 @@ def embedding_plot_per_best_config(
         score_dir = save_dir / score
         score_dir.mkdir(exist_ok=True)
         for algo_name, labels in labels_per_algo.items():
-            plt.figure(figsize=(10, 5))
+            fig, ax = plt.subplots(figsize=(10, 5))
+
+            outliers_mask = labels.map(str) == "-1"
+
             sns.scatterplot(
-                data=embedding,
+                data=embedding.loc[~outliers_mask],
                 x="x",
                 y="y",
-                hue=labels,
+                hue=labels.loc[~outliers_mask],
+                hue_order=list(
+                    map(str, sorted(labels.loc[~outliers_mask].map(int).unique()))
+                ),
+                ax=ax,
             )
-            plt.title(f"Best {algo_name} clustering on {SCORES_PRETTY_NAMES[score]}")
-            plt.legend(
+
+            sns.scatterplot(
+                data=embedding.loc[outliers_mask],
+                x="x",
+                y="y",
+                color="black",
+                label="outlier",
+                ax=ax,
+            )
+
+            ax.set_title(
+                f"Best {ALGO_PRETTY_NAMES[algo_name]} clustering on {SCORES_PRETTY_NAMES[score]}"
+            )
+            ax.legend(
                 loc="lower left",
                 bbox_to_anchor=(1.05, 0.4),
+                title="Cluster",
             )
-            plt.tight_layout()
-            plt.savefig(
+            fig.tight_layout()
+            fig.savefig(
                 score_dir
-                / f"Embedding_best_hyperparameters_{score}_{algo_name.replace(' ', '_')}.png"
+                / f"Embedding_best_hyperparameters_{score}_{ALGO_PRETTY_NAMES[algo_name].replace(' ', '_')}.png"
             )
             plt.close()
     if ground_truth is not None:
@@ -440,6 +460,7 @@ def embedding_plot_per_best_config(
         plt.legend(
             loc="lower left",
             bbox_to_anchor=(1.05, 0.4),
+            title=ground_truth.name,
         )
         plt.tight_layout()
         plt.savefig(save_dir / f"Embedding_best_hyperparameters_external_label.png")
